@@ -1,0 +1,616 @@
+/* ==========================================================================
+   HCLabs — SERVICE PAGE TEMPLATE (/services/<slug>/) — shared by all nine service pages.
+   Read docs/SERVICE_TEMPLATE.md before adding a page. One story per page:
+   1 hero: the service's own world inside the brand doorway (3D, per-service motif) · 2 how it connects to
+   Sarah's experience (a verbatim line, the relevant phrase underlined) · 3 situations where it helps ·
+   4 the HR Starter Pack (related documents) · 5 related services + previous / next · 6 Book a Free Consultation.
+   Every chapter change is an arch: the next ground rises over the last like a doorway (as on the homepage).
+   Identity per service: main[data-accent="sage|terracotta"] + the hero ground (theme-dark | theme-deep) +
+   the motif (data-motif on the stage). Tokens only — fallback SVGs carry brand hex as presentation attributes.
+   ========================================================================== */
+
+.page-service {
+  --dome: clamp(2.5rem, 1rem + 5.5vw, 7rem);
+  --svc-h2: clamp(2.05rem, 1.3rem + 2.9vw, 3.9rem);
+}
+
+/* ---- per-service accent ------------------------------------------------------ */
+.svc {
+  --svc-accent: var(--terracotta);          /* on navy grounds */
+  --svc-accent-rgb: var(--terracotta-rgb);
+  --svc-line: var(--clay);                  /* lines + large accent text on cream/paper */
+  --svc-ink: var(--clay-ink);               /* small accent text on cream/paper (AA) */
+  --svc-glow-rgb: var(--terracotta-rgb);
+}
+.svc[data-accent="sage"] {
+  --svc-accent: var(--sage);
+  --svc-accent-rgb: var(--sage-rgb);
+  --svc-line: var(--sage-deep);
+  --svc-ink: var(--sage-ink);
+  --svc-glow-rgb: var(--sage-rgb);
+}
+
+/* ---- shared SVG symbols (the person, the doorway, the nine service glyphs) ---- */
+.svc-symbols { position: absolute; width: 0; height: 0; overflow: hidden; }
+.s-head { fill: var(--s-head, var(--terracotta)); }
+.s-body { fill: var(--s-body, var(--sage)); }
+.s-frame { fill: var(--s-frame, var(--cream)); }
+.gl-paper { fill: var(--paper); }
+.gl-sand { fill: var(--sand); }
+.gl-sage { fill: var(--sage); }
+.gl-terra { fill: var(--terracotta); }
+.gl-terra-s { fill: var(--terracotta-shape); }
+.gl-ink { fill: rgb(var(--navy-rgb) / .3); }
+.gl-inkl { fill: rgb(var(--cream-rgb) / .45); }
+.gl-open { fill: none; stroke: var(--sage); stroke-width: 1.6; stroke-dasharray: 2.4 2.2; }
+.gl-lens { fill: rgb(var(--cream-rgb) / .16); stroke: var(--cream); stroke-width: 3.4; }
+.gl-glass { fill: rgb(var(--cream-rgb) / .12); stroke: rgb(var(--cream-rgb) / .55); stroke-width: 1.4; }
+.gl-arc { fill: none; stroke: var(--terracotta); stroke-width: 2.4; stroke-linecap: round; }
+.gl-dash { fill: none; stroke: var(--terracotta); stroke-width: 2; stroke-linecap: round; stroke-dasharray: .5 4.2; }
+.gl-link { fill: none; stroke: rgb(var(--cream-rgb) / .42); stroke-width: 1.6; }
+.gl-orbit { fill: none; stroke: var(--sage); stroke-width: 1.6; opacity: .8; }
+
+/* shared section display heading */
+.svc-h2 {
+  font-size: var(--svc-h2);
+  font-weight: 750;
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+  color: var(--heading);
+  text-wrap: balance;
+  max-width: 13ch;
+}
+/* the accent follows the nearest section ground (the body also carries a theme class, so resolve it per section) */
+.svc :is(.theme-dark, .theme-deep, .theme-ink) { --svc-em: var(--svc-accent); }
+.svc :is(.theme-light, .theme-paper) { --svc-em: var(--svc-line); }
+.svc-h2 em { color: var(--svc-em, var(--accent)); }
+
+/* every section after the hero rises over the last as a dome */
+.svc-exp, .svc-sit, .svc-pack, .svc-more, .svc-cta {
+  border-radius: 50% 50% 0 0 / var(--dome) var(--dome) 0 0;
+  margin-top: calc(var(--dome) * -1);
+}
+.svc-exp { z-index: 2; }
+.svc-sit { z-index: 3; }
+.svc-pack { z-index: 4; }
+.svc-more { z-index: 5; }
+.svc-cta { z-index: 6; }
+
+/* ==========================================================================
+   1 · HERO — copy + the service's world inside the doorway
+   ========================================================================== */
+.svc-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + clamp(1.25rem, .5rem + 3.2vw, 3.5rem));
+  padding-bottom: calc(var(--dome) + clamp(3.5rem, 2rem + 5vw, 6.5rem));
+}
+/* a quiet light where the doorway stands, in the service's accent */
+.svc-hero::before {
+  content: "";
+  position: absolute; z-index: 0;
+  inset: 0 -10% 0 40%;
+  background:
+    radial-gradient(34% 40% at 62% 46%, rgb(var(--svc-glow-rgb) / .12), transparent 70%),
+    radial-gradient(26% 30% at 80% 22%, rgb(var(--cream-rgb) / .045), transparent 70%);
+  pointer-events: none;
+}
+.svc-hero__art { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.svc-hero__line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+/* The stroke doesn't scale with the stretched viewBox (non-scaling-stroke), so Chrome lays the pathLength="1" dash out in
+   screen space: a dash of 1 then covers only 1/scale of the line (75% at 1920). service.js measures the drawn length
+   and sets --dash (in pathLength units) so the draw-on always ends exactly at the end of the line. */
+.svc-hero__line path { fill: none; stroke: var(--terracotta); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: none; opacity: .9; }
+html.js .svc-hero__line path { stroke-dasharray: var(--dash, 3); stroke-dashoffset: 0; animation: svc-draw 2.4s var(--ease-in-out) .55s both; }
+html.shot .svc-hero__line path { animation: none; stroke-dasharray: none; }
+@keyframes svc-draw { from { stroke-dashoffset: var(--dash, 3); } to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { html.js .svc-hero__line path { animation: none; stroke-dasharray: none; } }
+
+.svc-hero__grid {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(3rem, 2rem + 5vw, 4.5rem);
+  align-items: center;
+}
+.svc-hero__copy { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); min-width: 0; }
+.svc-hero__copy > .breadcrumbs { margin-bottom: clamp(0rem, 1vw, .75rem); }
+.svc-hero__eyebrow { color: var(--sage); }
+.svc-hero__eyebrow .eyebrow__num { color: var(--svc-accent); }
+.svc-hero__eyebrow::before { background: var(--svc-accent); }
+.svc-hero__of { margin-left: -.2rem; color: var(--faint); }
+.svc-hero__title {
+  font-size: clamp(2.3rem, 1.15rem + 3.9vw, 4.7rem);
+  font-weight: 770;
+  line-height: .99;
+  letter-spacing: -0.04em;
+  color: var(--heading);
+  max-width: 12.5ch;
+  text-wrap: balance;
+}
+.svc-hero__title em { color: var(--svc-accent); padding-right: .05em; }
+.svc-hero__title--long { font-size: clamp(2.1rem, 1.1rem + 3.1vw, 3.9rem); max-width: 15.5ch; }
+.svc-hero__lead { max-width: 33rem; }
+.svc-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-s) var(--space-l); margin-top: var(--space-2xs); }
+.svc-hero__facts {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: start;
+  width: 100%;
+  max-width: 46rem;
+  margin-top: clamp(.5rem, 2vw, 1.5rem);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--border);
+}
+.svc-hero__facts > div { display: grid; align-content: start; gap: .3rem; padding-right: clamp(1rem, 2.2vw, 2rem); margin-right: clamp(1rem, 2.2vw, 2rem); border-right: 1px solid var(--border); }
+.svc-hero__facts > div:last-child { border-right: 0; padding-right: 0; margin-right: 0; }
+.svc-hero__facts dt { font-size: .6875rem; font-weight: 650; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--faint); }
+.svc-hero__facts dd { font-size: .9375rem; font-weight: 620; text-wrap: balance; letter-spacing: -0.005em; color: var(--text); line-height: 1.35; }
+
+/* the doorway window: the service's world, framed by the logo's arch with a cream rim */
+.svc-hero__visual { position: relative; z-index: 1; justify-self: center; width: min(100%, 27rem); }
+.svc-door {
+  --r: var(--radius-l);
+  --rim: clamp(7px, .5rem + .25vw, 12px);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 6;
+  border-radius: var(--aw, 50%) var(--aw, 50%) var(--r) var(--r) / var(--aw, 42%) var(--aw, 42%) var(--r) var(--r);
+  background:
+    radial-gradient(90% 60% at 50% 34%, rgb(var(--svc-glow-rgb) / .12), transparent 70%),
+    radial-gradient(120% 50% at 50% 100%, rgb(var(--shadow-rgb) / .45), transparent 70%),
+    linear-gradient(180deg, var(--navy-soft) 0%, var(--navy) 58%, var(--navy-deep) 100%);
+  box-shadow:
+    0 0 0 var(--rim) var(--paper),
+    0 calc(var(--rim) * .5) 0 var(--rim) var(--sand),
+    0 30px 60px -18px rgb(var(--shadow-rgb) / .75),
+    0 10px 24px rgb(var(--shadow-rgb) / .4);
+  overflow: hidden;
+  isolation: isolate;
+}
+.svc-door::after { /* inner edge of the rim: a soft paper-layer shadow falling into the doorway */
+  content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 10px 22px -8px rgb(var(--shadow-rgb) / .7), inset 0 0 0 1px rgb(var(--shadow-rgb) / .35);
+}
+.svc-door__stage { position: absolute; inset: 0; }
+.svc-door__fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.svc-door__stage .hc3d-canvas { border-radius: inherit; }
+.svc-hero__num {
+  position: absolute; z-index: 4;
+  left: calc(var(--space-m) * -1);
+  bottom: -.2em;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(5.5rem, 3.5rem + 7vw, 10.5rem);
+  line-height: .7;
+  letter-spacing: -0.02em;
+  color: var(--svc-accent);
+  text-shadow: 0 .06em .12em rgb(var(--shadow-rgb) / .45);
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 64em) {
+  .svc-hero { display: flex; align-items: center; min-height: min(100svh, 66rem); }
+  .svc-hero > .container { width: 100%; }
+  .svc-hero__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--grid-gap); }
+  .svc-hero__visual { justify-self: end; width: min(100%, 31rem, calc((100svh - var(--header-h) - 9rem) * .833)); }
+  .svc-hero__num { left: -.42em; }
+}
+@media (min-width: 64em) and (max-height: 50em) {
+  .svc-hero__facts { display: none; }   /* short desktop screens: keep the hero to one view */
+}
+@media (max-width: 63.99em) {
+  .svc-hero__visual { margin-top: clamp(0rem, 2vw, 1rem); }
+  .svc-hero::before { inset: 40% -20% 0 -20%; }
+  .svc-hero__line { display: none; }   /* stacked: the doorway carries its own line */
+}
+@media (max-width: 40em) {
+  .svc-hero__facts { grid-template-columns: minmax(0, 1fr); gap: .9rem; }
+  .svc-hero__facts > div { grid-template-columns: 6.5rem minmax(0, 1fr); align-items: baseline; border-right: 0; padding-right: 0; margin-right: 0; }
+  .svc-hero__visual { width: min(100% - 1.5rem, 24rem); }
+  .svc-hero__num { left: -.5rem; }
+}
+
+/* ==========================================================================
+   2 · EXPERIENCE — a verbatim line from Sarah, the relevant phrase underlined
+   ========================================================================== */
+.svc-exp__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl) var(--grid-gap); }
+.svc-exp__side { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.svc-exp__about { margin-top: var(--space-2xs); }
+.svc-exp__main { min-width: 0; }
+.svc-quote { position: relative; margin: 0; }
+.svc-quote::before { /* the opening mark, as a serif glyph in the accent */
+  content: "\201C";
+  display: block;
+  height: .5em;
+  margin-bottom: .1em;
+  font-family: var(--font-serif);
+  font-size: clamp(4.5rem, 3rem + 4vw, 7rem);
+  line-height: .9;
+  color: var(--svc-line);
+}
+.svc-quote p {
+  font-size: clamp(1.4rem, 1.02rem + 1.5vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.26;
+  letter-spacing: -0.024em;
+  color: rgb(var(--navy-rgb) / .58);
+  text-wrap: pretty;
+}
+.svc-quote mark {
+  color: var(--heading);
+  background: linear-gradient(var(--svc-line), var(--svc-line)) 0 94% / var(--u, 0%) .085em no-repeat;
+  padding-bottom: .04em;
+  transition: background-size 1.3s var(--ease-in-out) .55s;
+}
+.svc-quote.is-in mark, html.shot .svc-quote mark, html:not(.js) .svc-quote mark, html.js-failed .svc-quote mark { --u: 100%; }
+.svc-quote__by { display: flex; align-items: center; gap: .8rem; margin-top: var(--space-l); font-size: var(--fs-small); color: var(--muted); }
+.svc-quote__by img { width: 1.6rem; height: auto; }
+.svc-quote__by strong { color: var(--text); font-weight: 650; margin-right: .35rem; }
+.svc-exp__text { margin-top: var(--space-xl); max-width: 42rem; font-size: 1.125rem; line-height: 1.7; color: var(--text); }
+.svc-facts { list-style: none; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-l) var(--grid-gap); margin-top: var(--space-xl); }
+.svc-facts__item { display: grid; align-content: start; gap: .5rem; padding-top: var(--space-m); border-top: 1px solid var(--border-strong); }
+.svc-facts__k { font-size: var(--fs-h4); font-weight: 680; letter-spacing: -0.015em; line-height: 1.25; color: var(--heading); min-height: 2.5em; display: flex; align-items: flex-end; }
+.svc-facts__num { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 2.6em; line-height: .8; letter-spacing: -0.02em; color: var(--svc-line); }
+.svc-facts__v { font-size: var(--fs-small); line-height: 1.55; color: var(--muted); max-width: 30ch; }
+@media (min-width: 48em) { .svc-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 64em) {
+  .svc-exp__grid { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: clamp(2rem, 5vw, 6rem); }
+  .svc-exp__side { position: sticky; top: calc(var(--header-h) + 2rem); align-self: start; }
+  .svc-quote { margin-top: -.3rem; }
+}
+
+/* ==========================================================================
+   3 · SITUATIONS — rows, each with the site-wide situation pictogram in an arch
+   ========================================================================== */
+.svc-sit__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl) var(--grid-gap); }
+.svc-sit__head { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.svc-sit__head .lead { max-width: 30rem; }
+.svc-sit__list { list-style: none; padding: 0; border-top: 1px solid var(--border); }
+.svc-sit__list > li { border-bottom: 1px solid var(--border); }
+.svc-sit__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.6rem clamp(6rem, 4rem + 6vw, 9.5rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(.9rem, .5rem + 1.5vw, 2rem);
+  padding-block: clamp(1.25rem, .8rem + 1.4vw, 2rem);
+  color: var(--text);
+}
+.svc-sit__row::before { /* a soft band of light slides in behind the row on hover */
+  content: ""; position: absolute; inset: 0 calc(var(--space-m) * -1); z-index: -1; border-radius: var(--radius-m);
+  background: linear-gradient(90deg, rgb(var(--svc-accent-rgb) / .09), rgb(var(--cream-rgb) / .02) 70%, transparent);
+  opacity: 0; transform: scaleX(.96); transform-origin: 0 50%;
+  transition: opacity .5s var(--ease-out), transform .7s var(--ease-out);
+}
+.svc-sit__num { align-self: start; margin-top: .35rem; font-family: var(--font-serif); font-style: italic; font-size: 1.75rem; line-height: 1; color: var(--svc-accent); }
+.svc-sit__art {
+  --r: var(--radius-s);
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1.02;
+  border-radius: var(--aw, 50%) var(--aw, 50%) var(--r) var(--r) / var(--aw, 48%) var(--aw, 48%) var(--r) var(--r);
+  background: radial-gradient(120% 90% at 50% 100%, rgb(var(--sage-rgb) / .1), transparent 60%), var(--navy-soft);
+  box-shadow: var(--shadow-dark-1), inset 0 1px 0 rgb(var(--cream-rgb) / .06);
+  overflow: hidden;
+  isolation: isolate;
+  transform: translate3d(0, var(--lift, 0px), 0);
+  transition: transform .8s var(--ease-out), box-shadow .6s var(--ease-out);
+}
+.svc-sit__art::after { /* the accent line traces the doorway on hover */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; z-index: 2;
+  background: conic-gradient(from 180deg at 50% 50%, var(--svc-accent) 0 var(--sweep), transparent var(--sweep) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+  pointer-events: none;
+  transition: --sweep 1.1s var(--ease-out);
+}
+.svc-sit__body { display: grid; gap: .4rem; min-width: 0; }
+.svc-sit__title { font-size: var(--fs-h3); font-weight: 700; letter-spacing: -0.022em; line-height: 1.12; color: var(--heading); text-wrap: balance; }
+.svc-sit__text { font-size: var(--fs-body); line-height: 1.55; color: var(--muted); max-width: 34ch; }
+.svc-sit__go { display: inline-grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--border-strong); color: var(--text); transition: background-color var(--dur-3), border-color var(--dur-3), color var(--dur-3), transform .6s var(--ease-spring); }
+@media (hover: hover) {
+  .svc-sit__row:hover::before { opacity: 1; transform: none; }
+  .svc-sit__row:hover .svc-sit__art { --lift: -6px; box-shadow: var(--shadow-dark-2), inset 0 1px 0 rgb(var(--cream-rgb) / .06); }
+  .svc-sit__row:hover .svc-sit__art::after { --sweep: 100%; }
+  .svc-sit__row:hover .svc-sit__go { background: var(--svc-accent); border-color: var(--svc-accent); color: var(--navy); transform: rotate(-45deg); }
+}
+/* the situation closest to this service (li.is-key): its doorway stays traced in the accent, its numeral lit;
+   the others' numerals step back */
+.svc-sit__list > li:not(.is-key) .svc-sit__num { color: var(--faint); }
+.svc-sit__list > li.is-key .svc-sit__art::after { --sweep: 100%; }
+.svc-sit__list > li.is-key .svc-sit__art { box-shadow: var(--shadow-dark-2), inset 0 1px 0 rgb(var(--cream-rgb) / .06); }
+.svc-sit__row:focus-visible { outline-offset: 4px; border-radius: var(--radius-m); }
+.svc-sit__row:focus-visible .svc-sit__art::after { --sweep: 100%; }
+@media (min-width: 64em) {
+  .svc-sit__grid { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: clamp(2rem, 5vw, 6rem); align-items: start; }
+  .svc-sit__head { position: sticky; top: calc(var(--header-h) + 2rem); }
+}
+@media (max-width: 40em) {
+  .svc-sit__row { grid-template-columns: 5.4rem minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 1.1rem; row-gap: .2rem; }
+  .svc-sit__art { grid-column: 1; grid-row: 1 / span 2; }
+  .svc-sit__num { grid-column: 2; grid-row: 1; margin-top: 0; font-size: 1.35rem; }
+  .svc-sit__body { grid-column: 2; grid-row: 2; }
+  .svc-sit__title { font-size: 1.2rem; }
+  .svc-sit__text { font-size: var(--fs-small); }
+  .svc-sit__go { display: none; }
+}
+
+/* the four situation pictograms (the same drawings as the homepage "Who it's for" doors) */
+.svc-ill { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: auto; overflow: visible; }
+.ill-floor { fill: none; stroke: rgb(var(--cream-rgb) / .16); stroke-width: 1.5; stroke-linecap: round; }
+.ill-path, .ill-rise, .ill-link { fill: none; stroke: var(--terracotta); stroke-width: 2.2; stroke-linecap: round; }
+.ill-path { stroke-dasharray: .02 .035; opacity: .7; }
+.ill-link, .ill-rise { stroke-dasharray: 1; }
+.ill-dot { fill: var(--terracotta); }
+.ill-sheet rect { fill: var(--cream); stroke: rgb(var(--navy-rgb) / .08); }
+.ill-sheet--2 rect { fill: var(--paper); }
+.ill-sheet--3 rect { fill: var(--sand); }
+.ill-rule { stroke: var(--clay); stroke-width: 3; stroke-linecap: round; }
+.ill-lines { stroke: rgb(var(--navy-rgb) / .2); stroke-width: 3; stroke-linecap: round; }
+.ill-check-bg { fill: var(--sage); }
+.ill-check { fill: none; stroke: var(--navy); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.svc-ill g { transform-box: fill-box; transition: transform .9s var(--ease-out); }
+.ill-sheet--3 { transform: rotate(-9deg) translate(-8px, 4px); transform-origin: 50% 100%; }
+.ill-sheet--2 { transform: rotate(-3.5deg) translate(-3px, 1px); transform-origin: 50% 100%; }
+.ill-sheet--1 { transform: rotate(3deg); transform-origin: 50% 100%; }
+.ill-f { transform-origin: 50% 100%; }
+@keyframes ill-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@media (hover: hover) {
+  .svc-sit__row:hover .ill-walker { transform: translateX(46px); }
+  .svc-sit__row:hover .ill-door { transform: scale(1.03); }
+  .svc-sit__row:hover .ill-f--1 { transform: translateY(-6px); }
+  .svc-sit__row:hover .ill-f--2 { transform: translateY(-9px); transition-delay: .06s; }
+  .svc-sit__row:hover .ill-f--3 { transform: translateY(-12px); transition-delay: .12s; }
+  .svc-sit__row:hover .ill-sheet--3 { transform: rotate(-16deg) translate(-22px, 6px); }
+  .svc-sit__row:hover .ill-sheet--2 { transform: rotate(-7deg) translate(-10px, 2px); }
+  .svc-sit__row:hover .ill-sheet--1 { transform: rotate(5deg) translate(8px, -4px); }
+  .svc-sit__row:hover .ill-f--a { transform: translateX(8px); }
+  .svc-sit__row:hover .ill-f--b { transform: translateX(-8px); }
+  .svc-sit__row:hover :is(.ill-link, .ill-rise) { animation: ill-draw 1.1s var(--ease-in-out) both; }
+}
+
+/* ==========================================================================
+   4 · HR STARTER PACK — the related documents, fanned in front of the brand's rimmed arch
+   ========================================================================== */
+.svc-pack__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl) var(--grid-gap); align-items: center; }
+.svc-pack__copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); min-width: 0; }
+.svc-pack__badge { margin-top: -.25rem; }
+.svc-pack__lead { max-width: 30rem; font-size: 1.125rem; line-height: 1.6; color: var(--muted); }
+.svc-pack__list { list-style: none; padding: 0; width: 100%; max-width: 34rem; border-top: 1px solid var(--border); counter-reset: none; }
+.svc-pack__list li { border-bottom: 1px solid var(--border); }
+.svc-pack__list a {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: .75rem;
+  padding: .72rem 0;
+  font-size: var(--fs-body);
+  font-weight: 560;
+  letter-spacing: -0.008em;
+  color: var(--muted);
+  transition: color var(--dur-2), transform .5s var(--ease-out);
+}
+.svc-pack__n { font-family: var(--font-serif); font-style: italic; font-size: 1.2em; line-height: 1; color: var(--faint); transition: color var(--dur-2); }
+.svc-pack__list .is-key a { color: var(--heading); font-weight: 650; }
+.svc-pack__list .is-key .svc-pack__n { color: var(--svc-ink); }
+.svc-pack__dot { align-self: center; width: 8px; height: 8px; border-radius: 50%; background: var(--svc-line); }
+.svc-pack__list a:hover, .svc-pack__list a:focus-visible, .svc-pack__list a.is-hot { color: var(--heading); transform: translateX(.4rem); }
+.svc-pack__list a:hover .svc-pack__n, .svc-pack__list a.is-hot .svc-pack__n { color: var(--svc-ink); }
+.svc-pack__key { display: inline-flex; align-items: center; gap: .6rem; margin-top: -.35rem; font-size: var(--fs-xs); font-weight: 600; color: var(--muted); }
+.svc-pack__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-s) var(--space-l); margin-top: var(--space-2xs); }
+
+.svc-pack__visual {
+  --dw: clamp(9.5rem, 6rem + 9vw, 14.5rem);
+  position: relative;
+  height: calc(var(--dw) * 2.55);
+  display: grid;
+  place-items: end center;
+  isolation: isolate;
+}
+.svc-pack__visual::before { /* the terracotta disc, behind the shoulder of the arch */
+  content: ""; position: absolute; z-index: -1;
+  left: calc(50% + var(--dw) * .42); bottom: calc(var(--dw) * 1.62);
+  width: calc(var(--dw) * 1.02); aspect-ratio: 1; border-radius: 50%;
+  background: var(--terracotta-shape);
+  box-shadow: 0 10px 26px rgb(var(--shadow-rgb) / .3);
+}
+.svc-pack__arch { /* the brand's sage arch with a cream rim, rising from below */
+  position: absolute; z-index: 0;
+  left: 50%; bottom: 0;
+  width: calc(var(--dw) * 2.02);
+  height: calc(var(--dw) * 2.3);
+  transform: translateX(-50%);
+  border-radius: calc(var(--dw) * 1.01) calc(var(--dw) * 1.01) 0 0;
+  background: linear-gradient(180deg, var(--sage-shape), var(--sage-brand));
+  border: calc(var(--dw) * .075) solid var(--paper);
+  border-bottom: 0;
+  box-shadow: 0 22px 44px -16px rgb(var(--shadow-rgb) / .5), 0 4px 12px rgb(var(--shadow-rgb) / .16);
+}
+.svc-pack__visual::after { /* the arch rises out of the ground: its foot dissolves into the section instead of ending
+                              on a flat, shadowed edge (above the arch, below the documents) */
+  content: ""; position: absolute; z-index: 0; pointer-events: none;
+  left: -2rem; right: -2rem; bottom: -4rem;      /* reaches past the tail of the arch's drop shadow */
+  height: calc(var(--dw) * .62 + 4rem);
+  background-color: var(--background);
+  background-image: var(--grain-light, none);    /* the section's own ground + print grain, so no patch shows */
+  -webkit-mask-image: linear-gradient(to top, #000 24%, transparent);
+  mask-image: linear-gradient(to top, #000 24%, transparent);
+}
+.svc-pack__fan { position: relative; z-index: 1; width: var(--dw); height: calc(var(--dw) * 1.34); margin-bottom: calc(var(--dw) * .24); perspective: 1400px; }
+.svc-doc {
+  --k: calc(var(--i) - (var(--n) - 1) / 2);   /* −1 … 1 around the centre */
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: calc(var(--dw) * .08) calc(var(--dw) * .085);
+  border-radius: calc(var(--dw) * .05);
+  background: linear-gradient(165deg, var(--cream-bright) 0%, var(--cream) 55%, var(--paper) 100%);
+  color: var(--navy);
+  font-size: calc(var(--dw) * .074);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .7) inset, 0 0 0 1px rgb(var(--navy-rgb) / .06), 0 18px 34px -14px rgb(var(--shadow-rgb) / .55), 0 3px 8px rgb(var(--shadow-rgb) / .14);
+  transform-origin: 50% 110%;
+  transform: translate3d(calc(var(--k) * var(--dw) * .62), calc(var(--k) * var(--k) * var(--dw) * .06), 0) rotate(calc(var(--k) * 8deg));
+  transition: transform .8s var(--ease-out), box-shadow .6s var(--ease-out);
+  z-index: calc(1 + var(--i));
+}
+.svc-doc.is-active {
+  z-index: 20;
+  transform: translate3d(calc(var(--k) * var(--dw) * .56), calc(var(--dw) * -.2), 40px) rotate(calc(var(--k) * 3deg)) scale(1.05);
+  box-shadow: 0 1px 0 rgb(255 255 255 / .7) inset, 0 0 0 1.5px var(--svc-line), 0 30px 50px -18px rgb(var(--shadow-rgb) / .6), 0 6px 14px rgb(var(--shadow-rgb) / .16);
+}
+.svc-doc__head { display: flex; align-items: flex-start; gap: .55em; min-height: 2.4em; }
+.svc-doc__num { flex: none; font-family: var(--font-serif); font-style: italic; font-size: 1.8em; line-height: .8; color: var(--clay); }
+.svc-doc__title { font-weight: 760; font-size: 1em; line-height: 1.14; letter-spacing: -0.02em; text-wrap: balance; }
+.svc-doc__rule { display: block; width: 26%; height: 2px; margin: .85em 0 1em; border-radius: 2px; background: var(--terracotta-shape); }
+.svc-doc__lines { flex: 1; display: flex; flex-direction: column; gap: .7em; }
+.svc-doc__lines i { display: block; position: relative; height: .3em; border-radius: 1em; background: rgb(var(--navy-rgb) / .13); }
+.svc-doc__lines i:nth-child(3n+2) { width: 84%; }
+.svc-doc__lines i:nth-child(4n) { width: 58%; }
+.svc-doc__lines--check i, .svc-doc__lines--steps i { height: .95em; background: none; }
+.svc-doc__lines--check i::before { content: ""; position: absolute; left: 0; top: 0; width: .95em; height: .95em; border-radius: 50%; background: rgb(var(--sage-rgb) / .6); }
+.svc-doc__lines--steps i::before { content: ""; position: absolute; left: 0; top: 0; width: 1em; height: 1em; border-radius: 999px 999px 3px 3px; background: rgb(var(--terracotta-rgb) / .5); }
+.svc-doc__lines--check i::after, .svc-doc__lines--steps i::after { content: ""; position: absolute; left: 1.6em; right: 16%; top: .34em; height: .28em; border-radius: 1em; background: rgb(var(--navy-rgb) / .13); }
+.svc-doc__lines--check i:nth-child(even)::after, .svc-doc__lines--steps i:nth-child(even)::after { right: 34%; }
+.svc-doc__foot { display: flex; align-items: center; gap: .45em; margin-top: auto; padding-top: .6em; font-size: .56em; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgb(var(--navy-rgb) / .5); }
+.svc-doc__foot img { width: 1.05em; height: auto; }
+@media (min-width: 64em) {
+  .svc-pack__grid { grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); column-gap: clamp(2rem, 5vw, 6rem); }
+  .svc-pack__visual { --dw: clamp(10rem, 4rem + 10vw, 15rem); }
+}
+@media (max-width: 40em) {
+  .svc-pack__visual { --dw: clamp(7.5rem, 30vw, 9.5rem); margin-inline: calc(var(--gutter) * -1); overflow: hidden; }
+}
+
+/* ==========================================================================
+   5 · KEEP EXPLORING — related services + previous / next
+   ========================================================================== */
+.svc-more__head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-m) var(--space-xl); margin-bottom: clamp(2.25rem, 1.5rem + 2.5vw, 3.75rem); }
+.svc-more__head > div { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.svc-rel { list-style: none; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--grid-gap); }
+.svc-rel > li { display: flex; }
+.svc-rel__card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: 1.1rem;
+  row-gap: .6rem;
+  width: 100%;
+  padding: clamp(1.35rem, 1rem + 1.2vw, 2rem);
+  border-radius: var(--radius-l);
+  background: linear-gradient(180deg, rgb(var(--cream-rgb) / .05), rgb(var(--cream-rgb) / .02));
+  border: 1px solid var(--border);
+  color: var(--text);
+  box-shadow: var(--shadow-dark-1);
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+  transition: transform .7s var(--ease-out), box-shadow .5s var(--ease-out), border-color .4s var(--ease-out), background-color .4s;
+}
+.svc-rel__card.is-tilting { transition: transform .12s linear, box-shadow .5s var(--ease-out), border-color .4s var(--ease-out); }
+.svc-rel__card::after { /* the accent traces the outline on hover (the doorway) */
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from 180deg at 50% 50%, var(--svc-accent) 0 var(--sweep), transparent var(--sweep) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+  transition: --sweep 1s var(--ease-out);
+}
+.svc-rel__glyph {
+  grid-row: 1 / span 2;
+  display: grid; place-items: center;
+  width: 4.25rem; height: 4.6rem;
+  border-radius: 999px 999px 12px 12px;
+  background: radial-gradient(90% 70% at 50% 100%, rgb(var(--sage-rgb) / .14), transparent 70%), var(--navy-soft);
+  box-shadow: inset 0 1px 0 rgb(var(--cream-rgb) / .06);
+  transition: transform .7s var(--ease-spring);
+}
+.svc-rel__glyph svg { width: 2.9rem; height: 2.9rem; margin-top: .35rem; overflow: visible; }
+.svc-rel__num { font-family: var(--font-serif); font-style: italic; font-size: 1.45rem; line-height: 1; color: var(--svc-accent); align-self: end; }
+.svc-rel__title { font-size: var(--fs-h4); font-weight: 680; letter-spacing: -0.016em; line-height: 1.25; color: var(--heading); text-wrap: balance; align-self: start; }
+.svc-rel__go { grid-column: 2; justify-self: end; display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; margin-top: var(--space-s); border-radius: 50%; border: 1px solid var(--border-strong); transition: background-color var(--dur-3), border-color var(--dur-3), color var(--dur-3), transform .6s var(--ease-spring); }
+@media (hover: hover) {
+  .svc-rel__card:hover { --lift: -6px; border-color: transparent; box-shadow: var(--shadow-dark-2); }
+  .svc-rel__card:hover::after { --sweep: 100%; }
+  .svc-rel__card:hover .svc-rel__glyph { transform: translate3d(0, -4px, 0); }
+  .svc-rel__card:hover .svc-rel__go { background: var(--svc-accent); border-color: var(--svc-accent); color: var(--navy); transform: rotate(-45deg); }
+}
+.svc-rel__card:focus-visible { outline-offset: 5px; }
+.svc-rel__card:focus-visible::after { --sweep: 100%; }
+@media (min-width: 48em) { .svc-rel { grid-template-columns: repeat(3, minmax(0, 1fr)); } .svc-rel__card { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr auto; } .svc-rel__glyph { grid-row: auto; margin-bottom: var(--space-s); } .svc-rel__go { grid-column: 1; } }
+
+.svc-pager {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: clamp(3rem, 2rem + 4vw, 5.5rem);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.svc-pager__link {
+  position: relative;
+  isolation: isolate;
+  display: flex; flex-direction: column; gap: .9rem;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.75rem) 0;
+  color: var(--text);
+  overflow: hidden;
+}
+.svc-pager__link + .svc-pager__link { border-top: 1px solid var(--border); }
+.svc-pager__dir { display: inline-flex; align-items: center; gap: .6rem; font-size: var(--fs-label); font-weight: 650; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--sage); }
+.svc-pager__dir .arrow { color: var(--svc-accent); }
+.svc-pager__link--prev .svc-pager__dir .arrow { transform: scaleX(-1); }
+.svc-pager__row { display: flex; align-items: center; gap: clamp(.8rem, .5rem + 1vw, 1.4rem); }
+.svc-pager__glyph { flex: none; display: grid; place-items: center; width: 3.4rem; height: 3.7rem; border-radius: 999px 999px 10px 10px; background: var(--navy-soft); transition: transform .7s var(--ease-spring); }
+.svc-pager__glyph svg { width: 2.3rem; height: 2.3rem; margin-top: .3rem; overflow: visible; }
+.svc-pager__num { flex: none; font-family: var(--font-serif); font-style: italic; font-size: 1.9rem; line-height: 1; color: var(--svc-accent); }
+.svc-pager__title { font-size: clamp(1.2rem, 1rem + .9vw, 1.75rem); font-weight: 700; letter-spacing: -0.022em; line-height: 1.15; color: var(--heading); text-wrap: balance; background: linear-gradient(var(--svc-accent), var(--svc-accent)) 0 100% / 0% 1.5px no-repeat; padding-bottom: .12em; transition: background-size .7s var(--ease-out); }
+@media (hover: hover) {
+  .svc-pager__link:hover .svc-pager__title { background-size: 100% 1.5px; }
+  .svc-pager__link:hover .svc-pager__glyph { transform: translate3d(0, -4px, 0); }
+  .svc-pager__link--next:hover .svc-pager__dir .arrow::before, .svc-pager__link--prev:hover .svc-pager__dir .arrow::before { transform: translate3d(130%, 0, 0); }
+  .svc-pager__link--next:hover .svc-pager__dir .arrow::after, .svc-pager__link--prev:hover .svc-pager__dir .arrow::after { transform: none; }
+}
+.svc-pager__link:focus-visible { outline-offset: -2px; border-radius: var(--radius-s); }
+.svc-pager__link:focus-visible .svc-pager__title { background-size: 100% 1.5px; }
+@media (min-width: 48em) {
+  .svc-pager { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .svc-pager__link + .svc-pager__link { border-top: 0; border-left: 1px solid var(--border); }
+  .svc-pager__link--prev { padding-right: var(--space-l); }
+  .svc-pager__link--next { padding-left: var(--space-l); align-items: flex-end; text-align: right; }
+  .svc-pager__link--next .svc-pager__row { flex-direction: row-reverse; }
+}
+
+/* ==========================================================================
+   6 · BOOK A FREE CONSULTATION — the page always ends here
+   ========================================================================== */
+.svc-cta { padding-bottom: clamp(4rem, 3rem + 4vw, 7rem); }
+.svc-cta__band .cta-band__title em { color: var(--terracotta); }
+.svc-cta__band .cta-band__content { max-width: 44rem; }
+@media (min-width: 64em) {
+  .svc-cta__band { min-height: 30rem; align-content: center; }
+  .svc-cta__band .cta-band__art .brand-arch { right: clamp(3rem, 12vw, 12rem); }
+}
+/* the open door (the logo figure) standing on the line, as in the homepage's consultation band */
+.svc-cta__door {
+  --size: clamp(6rem, 3rem + 7vw, 11.5rem);
+  --doorway-frame: var(--cream);
+  --doorway-body: var(--sage);
+  position: absolute;
+  right: clamp(3.5rem, 15vw, 15rem);
+  bottom: clamp(1.4rem, 1rem + 2vw, 3rem);
+  filter: drop-shadow(0 12px 16px rgb(var(--shadow-rgb) / .5));
+}
+@media (max-width: 47.99em) {
+  .svc-cta__door { --size: 5.2rem; right: 32%; bottom: 1.6rem; }
+}
+/* phones: a slightly tighter large button so the label holds one line from 360px up (it wraps neatly below that) */
+@media (max-width: 30em) {
+  .svc-cta__band .btn--lg { --btn-px: 1.3rem; font-size: 1rem; }
+}
+@media (min-width: 22.5em) and (max-width: 30em) {
+  .svc-cta__band .btn--lg { white-space: nowrap; }
+}
+
+/* keep a hyphenated phrase together where there is room (e.g. "Employment-related") */
+@media (min-width: 40em) { .svc-nb { white-space: nowrap; } }
+/* short hyphenated phrases that must never break at the hyphen (e.g. "30-minute" in the hero facts, at 320px) */
+.svc-nw { white-space: nowrap; }

@@ -1,0 +1,502 @@
+/* ==========================================================================
+   HCLabs — contact (/contact/). "The conversation":
+   1 hero — the two ways to reach Sarah as large, living lines (email · phone, with copy), beside a 3D scene of you
+     and Sarah in her doorway, joined by the arc of a conversation; Sarah's card stands beneath the doorway
+   2 next steps — the free 30-minute consultation (the arch is half an hour on the clock) + the services
+   Tokens only (no raw hex) — the fallback SVG carries brand hex as presentation attributes, like the logo files.
+   ========================================================================== */
+
+.page-contact {
+  --dome: clamp(2.75rem, 1rem + 6vw, 7.5rem);   /* arched top edge where the next ground rises (as on the homepage) */
+}
+.ct-symbols { position: absolute; width: 0; height: 0; overflow: hidden; }
+.fig-head { fill: var(--fig-head, var(--terracotta)); }
+.fig-body { fill: var(--fig-body, var(--sage)); }
+.door-frame { fill: var(--door-frame, var(--cream)); }
+.ct-nowrap { white-space: nowrap; }
+
+/* ==========================================================================
+   1 · HERO
+   ========================================================================== */
+.ct-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + clamp(1.25rem, .5rem + 3vw, 3.5rem));
+  padding-bottom: calc(var(--dome) + clamp(2rem, 1.2rem + 3vw, 4.25rem));
+}
+/* a quiet light where the doorway stands (present from first paint, so the world emerges into light) */
+.ct-hero::before {
+  content: "";
+  position: absolute; z-index: 0;
+  inset: 0 -8% 0 44%;
+  background:
+    radial-gradient(34% 40% at 55% 42%, rgb(var(--sage-rgb) / .1), transparent 70%),
+    radial-gradient(26% 30% at 78% 22%, rgb(var(--terracotta-rgb) / .07), transparent 70%);
+  pointer-events: none;
+}
+.ct-hero__grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.ct-hero__copy, .ct-person { position: relative; z-index: 2; }
+.ct-hero__copy { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.ct-hero__crumbs { margin-bottom: clamp(1.25rem, .6rem + 2.2vw, 2.5rem); }
+.ct-hero__eyebrow { color: var(--sage); }
+.ct-hero__title {
+  margin-top: clamp(.9rem, .6rem + 1vw, 1.4rem);
+  font-size: clamp(2.55rem, 1.35rem + 3.7vw, 5.1rem);
+  font-weight: 780;
+  line-height: .98;
+  letter-spacing: -0.042em;
+  color: var(--heading);
+}
+.ct-hero__title em { color: var(--terracotta); padding-right: .03em; }
+/* the headline's lines are authored in the markup and rise from first paint (never gated behind a script reveal) */
+.ct-line { display: block; clip-path: inset(-0.4em -0.7em -0.34em -0.6em); }
+.ct-line__in { display: inline-block; }
+
+/* ---- hero entrance: compositor-only keyframes from the first frame. Paused while a page transition still covers
+   the page (so they play as it lifts); skipped in screenshots; collapsed (no delay) under reduced motion. ---- */
+@keyframes ct-line { from { transform: translate3d(0, 112%, 0); } }
+@keyframes ct-rise { from { opacity: 0; transform: translate3d(0, 22px, 0); } }
+@keyframes ct-fade { from { opacity: 0; } }
+.ct-hero__crumbs { animation: ct-fade .8s var(--ease-out) 40ms both; }
+.ct-hero__eyebrow { animation: ct-fade .9s var(--ease-out) 80ms both; }
+.ct-line__in { animation: ct-line 1.05s var(--ease-out-expo) calc(120ms + var(--l, 0) * 95ms) both; }
+.ct-channel { animation: ct-rise .95s var(--ease-out) calc(.44s + var(--i, 0) * .1s) both; }
+html.pt-enter:not(.pt-reveal) .ct-hero :is(.ct-hero__crumbs, .ct-hero__eyebrow, .ct-line__in, .ct-channel) { animation-play-state: paused; }
+html.shot .ct-hero :is(.ct-hero__crumbs, .ct-hero__eyebrow, .ct-line__in, .ct-channel) { animation: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .ct-hero :is(.ct-hero__crumbs, .ct-hero__eyebrow, .ct-line__in, .ct-channel) { animation: none !important; }
+}
+
+/* ---- the two channels ---------------------------------------------------- */
+.ct-channels {
+  container: channels / inline-size;
+  width: 100%;
+  margin-top: clamp(2rem, 1.2rem + 2.6vw, 3.4rem);
+  list-style: none; padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+.ct-channel {
+  --pad-y: clamp(1.1rem, .8rem + 1.1vw, 1.75rem);
+  --go: 3.25rem;
+  --gap: clamp(.9rem, .5rem + 1.2vw, 1.5rem);
+  --copy-w: 6.1rem;
+  position: relative;
+  border-top: 1px solid var(--border);
+}
+/* the terracotta line sweeps along the rule under the row you're on */
+.ct-channel::after {
+  content: "";
+  position: absolute; z-index: 3;
+  left: 0; right: 0; bottom: -1px;
+  height: 1.5px;
+  background: var(--terracotta);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .9s var(--ease-out);
+  pointer-events: none;
+}
+.ct-channel__link {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--gap);
+  padding-block: var(--pad-y);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+/* soft lift of the row surface */
+.ct-channel__link::before {
+  content: "";
+  position: absolute; z-index: -1;
+  inset: 0 calc(var(--gap) * -.75);
+  border-radius: var(--radius-m);
+  background:
+    radial-gradient(70% 140% at 12% 100%, rgb(var(--sage-rgb) / .11), transparent 70%),
+    rgb(var(--cream-rgb) / .025);
+  opacity: 0;
+  transition: opacity .5s var(--ease-out);
+}
+.ct-channel__icon {
+  --ico-bg: var(--navy-soft);
+  --ico-fg: var(--sage);
+  display: grid; place-items: center;
+  width: 3.6rem; height: 3.6rem;
+  border-radius: 50%;
+  background: var(--ico-bg);
+  color: var(--ico-fg);
+  box-shadow: inset 0 0 0 1px rgb(var(--cream-rgb) / .08), var(--shadow-dark-1);
+  transition: background-color .5s var(--ease-out), color .5s var(--ease-out), transform .7s var(--ease-spring);
+}
+.ct-ico { width: 2.35rem; height: 2.35rem; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ct-ico * { transform-box: fill-box; transition: transform .7s var(--ease-out), opacity .45s var(--ease-out), fill .5s var(--ease-out); }
+.ct-ico__env, .ct-ico__letter rect { fill: var(--ico-bg); }
+.ct-ico__letter { transform: translateY(4px); }
+.ct-ico__letter path { stroke-width: 1.4; opacity: .75; }
+.ct-ico__handset { transform-origin: 50% 50%; }
+.ct-ico__wave { opacity: 0; transform: translate(-2px, 2px); }
+
+.ct-channel__text { display: flex; flex-direction: column; gap: .3rem; min-width: 0; padding-right: calc(var(--copy-w) + var(--gap)); }
+.ct-channel__label {
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: 1.3;
+  color: var(--sage);
+}
+.ct-channel__value {
+  display: block;
+  font-size: clamp(1.6rem, 5.4cqi, 2.75rem);
+  font-weight: 730;
+  letter-spacing: -0.036em;
+  line-height: 1.08;
+  color: var(--heading);
+  white-space: nowrap;
+  transition: transform .7s var(--ease-out);
+}
+.ct-channel--phone .ct-channel__value { font-variant-numeric: lining-nums; }
+.ct-channel__go { width: var(--go); height: var(--go); }
+.ct-channel__go .arrow { color: currentColor; }
+
+/* copy button — sits over the row, outside the link (a button can't live inside a link) */
+.ct-copy {
+  position: absolute; z-index: 4;
+  top: 50%;
+  right: calc(var(--go) + var(--gap));
+  transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  min-width: var(--copy-w);
+  height: 2.35rem;
+  padding: 0 .95rem 0 .8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: rgb(var(--navy-deep-rgb) / .5);
+  color: var(--text);
+  font-size: var(--fs-xs);
+  font-weight: 620;
+  letter-spacing: .01em;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-3) var(--ease-out), border-color var(--dur-3) var(--ease-out), color var(--dur-3) var(--ease-out), transform .2s var(--ease-out);
+}
+.ct-copy:active { transform: translateY(-50%) scale(.95); }
+.ct-copy:focus-visible { outline-offset: 3px; border-radius: var(--radius-pill); }
+.ct-copy__icon { position: relative; display: block; width: 1.05rem; height: 1.05rem; flex: none; }
+.ct-copy__icon svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .5s var(--ease-spring), opacity .3s var(--ease-out); }
+.ct-copy__tick { opacity: 0; transform: scale(.4); stroke-width: 2.1; }
+.ct-copy.is-copied { background: var(--sage); border-color: var(--sage); color: var(--navy); }
+.ct-copy.is-copied .ct-copy__sheets { opacity: 0; transform: scale(.5) rotate(-12deg); }
+.ct-copy.is-copied .ct-copy__tick { opacity: 1; transform: none; }
+.ct-copy.is-failed { border-color: rgb(var(--cream-rgb) / .7); background: rgb(var(--cream-rgb) / .08); color: var(--heading); }
+@media (hover: hover) {
+  .ct-copy:hover { border-color: rgb(var(--cream-rgb) / .6); background: rgb(var(--cream-rgb) / .07); }
+  .ct-copy.is-copied:hover { background: var(--sage); border-color: var(--sage); }
+  .ct-copy:hover .ct-copy__sheets { transform: translate(-1px, -1px); }
+}
+
+/* row interaction: hover (mouse) + keyboard focus + press */
+.ct-channel:has(.ct-channel__link:is(:hover, :focus-visible))::after { transform: scaleX(1); }
+.ct-channel__link:is(:hover, :focus-visible)::before { opacity: 1; }
+.ct-channel__link:is(:hover, :focus-visible) .ct-channel__value { transform: translateX(.45rem); }
+.ct-channel__link:is(:hover, :focus-visible) .ct-channel__icon { --ico-bg: var(--terracotta); --ico-fg: var(--navy); transform: rotate(-6deg) scale(1.04); }
+.ct-channel__link:is(:hover, :focus-visible) .ct-channel__go { background: var(--cream); border-color: var(--cream); color: var(--navy); }
+.ct-channel__link:is(:hover, :focus-visible) .ct-ico__letter { transform: translateY(-3.5px); }
+.ct-channel__link:is(:hover, :focus-visible) .ct-ico__wave { opacity: 1; transform: none; }
+.ct-channel__link:is(:hover, :focus-visible) .ct-ico__wave--2 { transition-delay: .12s; }
+.ct-channel__link:is(:hover, :focus-visible) .ct-ico__handset { animation: ct-ring .9s var(--ease-out) .05s; }
+.ct-channel__link:active .ct-channel__value { transform: translateX(.45rem) scale(.985); transition-duration: .15s; }
+.ct-channel__link:focus-visible { outline-offset: 2px; border-radius: var(--radius-m); }
+@keyframes ct-ring {
+  0%, 100% { transform: none; }
+  15% { transform: rotate(-12deg); }
+  30% { transform: rotate(10deg); }
+  45% { transform: rotate(-8deg); }
+  60% { transform: rotate(5deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+/* compact rows (narrow column: phones, and the two-column hero at ~1024) — copy sits on the label line */
+@container channels (max-width: 39.99rem) {
+  .ct-channel { --go: 2.9rem; --gap: .85rem; --copy-w: 5.4rem; }
+  .ct-channel__icon { display: none; }
+  .ct-channel__link { grid-template-columns: minmax(0, 1fr) auto; }
+  .ct-channel__text { padding-right: 0; gap: .35rem; }
+  .ct-channel__label { display: flex; align-items: center; min-height: 2.2rem; }
+  .ct-channel__value { font-size: clamp(1.2rem, 6.9cqi, 2.4rem); }
+  .ct-copy { top: var(--pad-y); transform: none; height: 2.2rem; font-size: .78rem; padding: 0 .8rem 0 .7rem; }
+  .ct-copy:active { transform: scale(.95); }
+  /* the arrow disc shares the Copy pill's centre line (the label line), so the two round controls sit as a pair */
+  .ct-channel__go { align-self: start; margin-top: calc((2.2rem - var(--go)) / 2); }
+}
+/* a comfortable ~44px tap target, without changing how the pill looks */
+.ct-copy::before { content: ""; position: absolute; inset: -5px -4px; border-radius: inherit; }
+/* no script → no Copy button (it ships hidden): don't hold its space */
+.ct-channel:has(.ct-copy[hidden]) .ct-channel__text { padding-right: 0; }
+
+/* ---- Sarah (beneath the doorway) ------------------------------------------ */
+.ct-person {
+  container: person / inline-size;
+  display: grid;
+  gap: .95rem;
+  padding: clamp(1.1rem, .85rem + .9vw, 1.5rem) clamp(1.2rem, 1rem + 1vw, 1.7rem);
+  border-radius: var(--radius-l);
+  background: linear-gradient(180deg, rgb(var(--cream-rgb) / .05), rgb(var(--cream-rgb) / .015)), rgb(var(--navy-deep-rgb) / .86);
+  box-shadow: inset 0 0 0 1px rgb(var(--cream-rgb) / .09), var(--shadow-dark-2);
+}
+.ct-person__top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: .95rem; }
+.ct-person__mark {
+  display: grid; place-items: end center;
+  width: 3rem; height: 3.3rem;
+  padding-top: .55rem;
+  border-radius: 999px 999px 9px 9px;
+  background: var(--cream);
+  overflow: hidden;
+  box-shadow: var(--shadow-dark-1);
+}
+.ct-person__mark svg { width: 1.35rem; height: 1.97rem; }
+.ct-person__name { display: flex; flex-direction: column; min-width: 0; line-height: 1.3; }
+.ct-person__name strong { font-size: 1.12rem; font-weight: 720; letter-spacing: -0.015em; color: var(--heading); }
+.ct-person__name span { font-size: var(--fs-small); color: var(--muted); }
+.ct-person__exp { display: flex; align-items: center; gap: .6rem; padding-left: 1.1rem; border-left: 1px solid var(--border); }
+.ct-person__num { font-family: var(--font-serif); font-style: italic; font-size: 2.75rem; line-height: .8; letter-spacing: -0.02em; color: var(--terracotta); white-space: nowrap; }
+.ct-person__num span { font-size: .7em; margin-left: .02em; }
+.ct-person__years { font-size: var(--fs-xs); font-weight: 550; line-height: 1.3; color: var(--muted); }
+.ct-person__areas {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .35rem 1.05rem;
+  padding-top: .95rem;
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-small); font-weight: 600; letter-spacing: -0.004em; line-height: 1.4;
+  color: var(--text);
+}
+.ct-person__areas span { display: inline-flex; align-items: center; gap: .5rem; white-space: nowrap; }
+.ct-person__areas span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--sage); flex: none; }
+.ct-person__areas span:first-child::before { background: var(--terracotta); }
+@container person (max-width: 21rem) {
+  .ct-person__top { grid-template-columns: auto minmax(0, 1fr); row-gap: .9rem; }
+  .ct-person__exp { grid-column: 1 / -1; padding: .9rem 0 0; border-left: 0; border-top: 1px solid var(--border); }
+  .ct-person__years br { display: none; }
+  .ct-person__areas { padding-top: 0; border-top: 0; }
+}
+
+/* ---- 3D stage + static art ------------------------------------------------- */
+.ct-hero__stage { position: relative; z-index: 1; }
+.ct-hero__stage .hc3d-canvas { z-index: 1; }
+/* the static art is clipped to the stage, exactly like the canvas it stands in for. Its frame (--reg-*, --disc-*) is
+   measured by contact.js; the defaults below approximate that frame so the art is composed even before / without JS */
+.ct-fallback { position: absolute; inset: 0; overflow: hidden; pointer-events: none; transition: opacity .9s var(--ease-out); }
+.ct-hero__stage.fb-hold .ct-fallback { opacity: 0; }
+.ct-fallback__art {
+  position: absolute;
+  left: var(--reg-l, 14%); top: var(--reg-t, 12%);
+  width: calc(var(--reg-r, 90%) - var(--reg-l, 14%));
+  height: calc(var(--reg-b, 60%) - var(--reg-t, 12%));
+  overflow: visible;
+  --fig-head: var(--terracotta); --fig-body: var(--sage); --door-frame: var(--cream);
+}
+.ct-fallback__disc {
+  position: absolute;
+  left: calc(var(--disc-x, 90%) - var(--disc-r, 12rem));
+  top: calc(var(--disc-y, 20%) - var(--disc-r, 12rem));
+  width: calc(var(--disc-r, 12rem) * 2);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(90% 90% at 30% 25%, rgb(var(--cream-rgb) / .08), transparent 60%), var(--terracotta-shape);
+  box-shadow: 0 10px 28px rgb(var(--shadow-rgb) / .5);
+  opacity: .92;
+}
+
+/* desktop: copy left; the world fills the right half of the hero (bleeding off the top and right edges);
+   Sarah's card stands under the doorway */
+@media (min-width: 64em) {
+  .ct-hero { display: flex; align-items: center; min-height: min(100vh, 66rem); min-height: min(100svh, 66rem); }
+  .ct-hero > .container { width: 100%; }
+  .ct-hero__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: var(--grid-gap); align-items: end; }
+  .ct-hero__copy { grid-column: 1; grid-row: 1; }
+  .ct-person { grid-column: 2; grid-row: 1; justify-self: end; align-self: end; width: min(100%, 26rem); margin-left: auto; }
+  .ct-hero__stage {
+    position: absolute; z-index: 1; top: 0; right: 0; bottom: 0; width: 50%;
+    --reg-l: 12%; --reg-r: 92%; --reg-t: calc(var(--header-h) + 1.4rem); --reg-b: 55%;
+    --disc-r: clamp(6.25rem, 11vw, 13.4rem);
+    --disc-x: calc(100% - var(--disc-r) * .16);
+    --disc-y: calc(var(--header-h) + 1.4rem + var(--disc-r) * .3);
+  }
+}
+/* stacked (tablet / phone): channels → the world (full-bleed) → Sarah's card rising over its lower edge */
+@media (max-width: 63.99em) {
+  .ct-hero__stage {
+    height: clamp(17rem, 68vw, 25rem);
+    margin: clamp(1.25rem, 3vw, 2rem) calc(var(--gutter) * -1) 0;
+    --reg-l: 7%; --reg-r: 93%; --reg-t: 7%; --reg-b: calc(100% - 3.6rem);
+    --disc-r: clamp(4rem, 20vw, 9.4rem);
+    --disc-x: calc(100% - var(--disc-r) * .34);
+    --disc-y: max(calc(var(--disc-r) * 1.06), 36%);
+  }
+  .ct-hero::before { inset: 38% -20% 0 -20%; }
+  .ct-person { margin-top: -2.75rem; }
+}
+
+/* ==========================================================================
+   2 · NEXT STEPS
+   ========================================================================== */
+.ct-next {
+  position: relative; z-index: 3;
+  margin-top: calc(var(--dome) * -1);
+  border-radius: 50% 50% 0 0 / var(--dome) var(--dome) 0 0;
+  padding-top: calc(var(--dome) * .45 + var(--section-y-s));
+}
+.ct-next__head {
+  display: grid;
+  gap: var(--space-l) var(--grid-gap);
+  grid-template-columns: minmax(0, 1fr);
+  margin-bottom: clamp(2.5rem, 1.6rem + 3vw, 4.5rem);
+}
+.ct-next__title-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.ct-next__title {
+  max-width: 12ch;
+  font-size: clamp(2.2rem, 1.3rem + 3.3vw, 4.4rem);
+  font-weight: 750;
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+  color: var(--heading);
+}
+.ct-next__intro { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); max-width: 34rem; }
+.ct-next__intro .body-l { color: var(--muted); }
+@media (min-width: 64em) {
+  .ct-next__head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: end; }
+}
+
+.ct-next__grid { display: grid; gap: clamp(3rem, 2rem + 3vw, 4.5rem) var(--grid-gap); grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 64em) { .ct-next__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: clamp(2rem, 1rem + 3vw, 5rem); } }
+
+/* ---- the consultation: an arch that is half an hour on the clock --------- */
+.ct-consult {
+  --r: clamp(24px, 3vw, 40px);
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+  padding: clamp(1.6rem, 1rem + 3vw, 3.5rem);
+  border-radius: var(--r);
+  background-color: var(--navy);
+  background-image: radial-gradient(80% 70% at 85% 0%, rgb(var(--sage-rgb) / .1), transparent 60%), var(--grain-dark);
+  color: var(--text);
+  box-shadow: var(--shadow-3);
+  /* the hover lift rides on `translate`, separate from the reveal's `transform` (which is pinned to none once in) */
+  translate: 0 var(--lift, 0px);
+  transition: translate .8s var(--ease-out), box-shadow .6s var(--ease-out);
+}
+/* the shared reveal's transition shorthand would drop the lift + shadow easing: carry both alongside it */
+html.js .ct-consult[data-reveal] {
+  transition:
+    opacity var(--dur-4) var(--ease-out) var(--reveal-delay),
+    transform calc(var(--dur-4) + 200ms) var(--ease-out) var(--reveal-delay),
+    translate .8s var(--ease-out),
+    box-shadow .6s var(--ease-out);
+}
+/* the doorway outline traces in terracotta on hover (as on arch cards) */
+.ct-consult::after {
+  content: ""; position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit; padding: 1.5px;
+  background: conic-gradient(from 180deg at 50% 50%, var(--terracotta) 0 var(--sweep), transparent var(--sweep) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude;
+  pointer-events: none;
+  transition: --sweep 1.2s var(--ease-out);
+}
+.ct-consult__art { position: relative; display: flex; align-items: flex-end; gap: clamp(1rem, .5rem + 2vw, 2rem); }
+.ct-dial { width: clamp(9.5rem, 6rem + 12vw, 13.5rem); height: auto; flex: none; overflow: visible; --fig-head: var(--terracotta); --fig-body: var(--sage); }
+.ct-dial__track { fill: none; stroke: rgb(var(--cream-rgb) / .16); stroke-width: 2; }
+.ct-dial__ticks path { fill: none; stroke: rgb(var(--cream-rgb) / .34); stroke-width: 2; stroke-linecap: round; transition: stroke .35s var(--ease-out) calc(var(--t) * 90ms); }
+.ct-dial__arc { fill: none; stroke: var(--terracotta); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.ct-dial__dot { fill: var(--terracotta); transform-box: fill-box; transform-origin: 50% 50%; }
+.ct-dial__fig { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .8s var(--ease-spring); }
+.ct-consult__time { display: flex; flex-direction: column; gap: .5rem; padding-bottom: .2rem; }
+.ct-consult__num { font-family: var(--font-serif); font-style: italic; font-size: clamp(3.6rem, 2.6rem + 3.6vw, 6rem); line-height: .78; letter-spacing: -0.03em; color: var(--terracotta); }
+.ct-consult__unit { font-size: var(--fs-label); font-weight: 650; letter-spacing: var(--tracking-label); text-transform: uppercase; line-height: 1.6; color: var(--sage); }
+.ct-consult__body { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.ct-consult__title { font-size: var(--fs-h2); font-weight: 750; line-height: 1.04; letter-spacing: -0.032em; color: var(--heading); max-width: 13ch; }
+.ct-consult__text { color: var(--muted); max-width: 40ch; }
+.ct-consult__btn { margin-top: var(--space-2xs); }
+/* the whole card is the link: hovering anywhere raises the button's fill */
+@media (hover: hover) {
+  .ct-consult:hover { --lift: -6px; box-shadow: var(--shadow-4); }
+  .ct-consult:hover::after { --sweep: 100%; }
+  .ct-consult:hover .ct-consult__btn { color: var(--btn-fill-fg); }
+  .ct-consult:hover .ct-consult__btn::before { transform: none; }
+  .ct-consult:hover .ct-consult__btn .arrow::before { transform: translate3d(130%, 0, 0); }
+  .ct-consult:hover .ct-consult__btn .arrow::after { transform: none; }
+  .ct-consult:hover .ct-dial__ticks path { stroke: var(--terracotta); }
+  .ct-consult:hover .ct-dial__fig { transform: translateY(-5px); }
+  .ct-consult:hover .ct-dial__dot { animation: ct-dot 1.2s var(--ease-out) .55s; }
+}
+/* the ring is drawn on the cream ground outside the (dark) card, so it takes the light ground's focus colour */
+.ct-consult:focus-visible { outline-color: var(--sage-deep); outline-offset: 5px; border-radius: var(--r); }
+.ct-consult:focus-visible::after { --sweep: 100%; }
+@keyframes ct-dot { 0%, 100% { transform: none; } 40% { transform: scale(1.6); } }
+/* the half hour draws itself when the card arrives */
+html.js .ct-consult .ct-dial__arc { stroke-dashoffset: 1; transition: stroke-dashoffset 1.9s var(--ease-in-out) .35s; }
+html.js .ct-consult .ct-dial__dot { transform: scale(0); transition: transform .7s var(--ease-spring) 2.05s; }
+html.js .ct-consult.is-in .ct-dial__arc { stroke-dashoffset: 0; }
+html.js .ct-consult.is-in .ct-dial__dot { transform: none; }
+html.shot .ct-consult .ct-dial__arc, html.js-failed .ct-consult .ct-dial__arc { stroke-dashoffset: 0; }
+html.shot .ct-consult .ct-dial__dot, html.js-failed .ct-consult .ct-dial__dot { transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .ct-consult .ct-dial__arc { stroke-dashoffset: 0; }
+  html.js .ct-consult .ct-dial__dot { transform: none; }
+}
+@media (min-width: 48em) {
+  .ct-consult { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+  .ct-consult__art { grid-column: 2; grid-row: 1; flex-direction: column; align-items: center; text-align: center; }
+  .ct-consult__time { align-items: center; }
+  .ct-consult__body { grid-column: 1; grid-row: 1; }
+}
+@media (min-width: 64em) and (max-width: 79.99em) {
+  .ct-consult { grid-template-columns: minmax(0, 1fr); }
+  .ct-consult__art { grid-column: 1; flex-direction: row; align-items: flex-end; text-align: left; }
+  .ct-consult__time { align-items: flex-start; }
+  .ct-consult__body { grid-row: 2; }
+}
+@media (max-width: 30em) {
+  .ct-consult__btn { width: 100%; padding-inline: 1.25rem; font-size: .95rem; }
+}
+/* narrow phones (320–383): the dial gives way so "30 minutes · free / no obligation" keeps its line beside it */
+@media (max-width: 23.99em) {
+  .ct-consult { padding-inline: 1.25rem; }
+  .ct-consult__art { gap: .85rem; }
+  .ct-dial { width: 6.25rem; }
+  .ct-consult__unit { letter-spacing: .08em; }
+  /* "Book a Free 30-Minute / Consultation" — two even lines, not three */
+  .ct-consult__btn { padding-inline: 1rem; font-size: .9rem; }
+  .ct-consult__btn .btn__label { text-wrap: balance; }
+}
+
+/* ---- services ------------------------------------------------------------- */
+.ct-svc { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-s); }
+.ct-svc__title { margin-top: .35rem; font-size: var(--fs-h3); font-weight: 720; letter-spacing: -0.024em; line-height: 1.12; }
+.ct-svc__intro { color: var(--muted); max-width: 36ch; }
+.ct-svc__list { width: 100%; margin-top: var(--space-s); list-style: none; padding: 0; border-top: 1px solid var(--border-strong); }
+.ct-svc__list li { border-bottom: 1px solid var(--border); }
+.ct-svc__list a {
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .82rem 0;
+  font-size: .975rem;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  line-height: 1.35;
+  color: var(--text);
+}
+.ct-svc__num { font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; line-height: 1; color: var(--clay-ink); transition: transform .5s var(--ease-out); }
+.ct-svc__name { transition: transform .55s var(--ease-out); }
+.ct-svc__list .arrow { color: var(--clay); opacity: 0; transform: translate3d(-8px, 0, 0); transition: opacity .35s var(--ease-out), transform .5s var(--ease-out); }
+.ct-svc__list a:is(:hover, :focus-visible) .ct-svc__name { transform: translateX(.35rem); }
+.ct-svc__list a:is(:hover, :focus-visible) .arrow { opacity: 1; transform: none; }
+.ct-svc__list a:is(:hover, :focus-visible) .ct-svc__num { transform: translateX(.15rem); }
+.ct-svc__list a:focus-visible { outline-offset: 2px; }
+.ct-svc__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-s) var(--space-l); margin-top: var(--space-m); }

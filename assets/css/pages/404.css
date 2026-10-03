@@ -1,0 +1,105 @@
+/* 404 — an empty doorway */
+.nf__hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(3rem, 2rem + 4vw, 5.5rem);
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + clamp(2.5rem, 1rem + 5vw, 5rem));
+  padding-bottom: clamp(3.5rem, 2rem + 5vw, 6rem);
+}
+.nf__art { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+/* the disc enters from the top-right corner, well clear of the figure: its terracotta head always reads against navy */
+.nf__disc { --size: clamp(13rem, 7rem + 18vw, 26rem); position: absolute; right: calc(var(--size) * -.62); top: calc(var(--size) * -.08); }
+/* the line runs behind the door (its opening is opaque) and stays well above the quick-links row */
+.nf__line { position: absolute; left: 0; right: 0; bottom: 36%; height: clamp(5rem, 13vw, 12rem); }
+
+.nf__grid { display: grid; gap: var(--space-2xl) var(--grid-gap); grid-template-columns: minmax(0, 1fr); align-items: center; }
+@media (min-width: 64em) { .nf__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+.nf__copy { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.nf__title { max-width: 12ch; }
+.nf__actions { display: flex; flex-wrap: wrap; gap: var(--space-s); margin-top: var(--space-s); }
+
+/* the doorway, with the person stepped out */
+.nf__visual {
+  --w: clamp(10rem, 6rem + 14vw, 17rem);
+  position: relative;
+  justify-self: center;
+  width: calc(var(--w) * 1.9);
+  height: calc(var(--w) * 56 / 52 + 2rem);
+}
+.nf__door {
+  position: absolute; left: 0; bottom: 2rem;
+  width: var(--w); height: calc(var(--w) * 56 / 52);
+  border-radius: calc(var(--w) / 2) calc(var(--w) / 2) 0 0;
+  border: calc(var(--w) * 9.5 / 52) solid var(--cream);
+  border-bottom: 0;
+  background: linear-gradient(to bottom, var(--navy-ink), var(--navy-deep));
+  box-shadow: 0 18px 40px -16px rgb(var(--shadow-rgb) / .7);
+}
+.nf__figure {
+  position: absolute;
+  left: calc(var(--w) * 1.3); bottom: 2rem;
+  width: calc(var(--w) * 24 / 52 * 1.15);
+  height: calc(var(--w) * 35 / 52 * 1.15);
+  animation: nf-step 1.8s var(--ease-out-expo) .45s both;
+}
+.nf__head {
+  position: absolute; left: 50%; top: 0;
+  width: 50%; aspect-ratio: 1; margin-left: -25%;
+  border-radius: 50%;
+  background: var(--terracotta);
+}
+.nf__body {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 51.4%;
+  border-radius: 999px 999px 0 0;
+  background: var(--sage);
+}
+.nf__floor {
+  position: absolute; left: -12%; right: -6%; bottom: calc(2rem - 1px);
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgb(var(--cream-rgb) / .35) 18%, rgb(var(--cream-rgb) / .35) 82%, transparent);
+}
+@keyframes nf-step {
+  from { transform: translate3d(calc(var(--w) * -.95), 0, 0); opacity: 0; }
+  25% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+html.shot .nf__figure { animation: none; }
+
+.nf__list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid var(--border);
+}
+@media (min-width: 48em) { .nf__list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 var(--space-m); border-top: 0; } }
+.nf__list a {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr auto;
+  align-items: baseline;
+  gap: .5rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--border);
+  font-weight: 620;
+  color: var(--text);
+  transition: color var(--dur-2), border-color var(--dur-3);
+}
+@media (min-width: 48em) {
+  .nf__list a { grid-template-columns: 1fr auto; grid-template-rows: auto auto; row-gap: 1.25rem; padding: 1.25rem 0 1.1rem; border-bottom: 0; border-top: 1px solid var(--border-strong); }
+  .nf__list .nf__num { grid-column: 1 / -1; }
+}
+.nf__list a:hover { border-color: var(--terracotta); }
+.nf__num { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 1.15rem; color: var(--sage); }
+.nf__list .arrow { color: var(--terracotta); }
+.nf__contact { margin-top: var(--space-l); color: var(--muted); font-size: var(--fs-small); }
+@media (max-width: 63.99em) {
+  .nf__disc { --size: 12rem; top: calc(var(--header-h) * .35); right: calc(var(--size) * -.7); }
+  .nf__line { bottom: 52%; }
+}

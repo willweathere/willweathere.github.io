@@ -1,0 +1,196 @@
+/* ==========================================================================
+   HCLabs — design tokens
+   Every value here is derived from the approved logo artwork:
+   deep navy ground · cream doorway arch · terracotta head/disc · sage shoulders/arch · one flowing line.
+   Page CSS must use these tokens (never raw hex) so every page stays one system.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand palette (raw) -------------------------------------------- */
+  --navy: #1A2842;          /* primary ground */
+  --navy-deep: #131F36;
+  --navy-ink: #0E1628;
+  --navy-soft: #24344F;
+  --navy-line: #4A5B78;     /* logo divider rule */
+
+  --cream: #F8F2EA;         /* text on dark · light ground */
+  --paper: #F1E9DF;
+  --sand: #E3D5C4;
+  --cream-bright: #FCF8F2;  /* lifted surface on cream (cards, fields) */
+
+  --sage: #A3BDB9;          /* accent on dark */
+  --sage-brand: #86A09D;
+  --sage-shape: #93AFAB;
+  --sage-deep: #5F807C;     /* large accent text / lines on light grounds */
+  --sage-ink: #4A6A66;      /* small accent text on light grounds (AA on cream + paper) */
+
+  --terracotta: #DE9F7C;    /* accent on dark */
+  --terracotta-shape: #D8997A;
+  --clay: #B97A5C;          /* terracotta lines/large text on light grounds */
+  --clay-ink: #8E553B;      /* small terracotta text on light grounds (AA on cream + paper) */
+
+  /* RGB triplets for alpha use: rgb(var(--navy-rgb) / .5) */
+  --navy-rgb: 26 40 66;
+  --navy-deep-rgb: 19 31 54;
+  --navy-ink-rgb: 14 22 40;
+  --cream-rgb: 248 242 234;
+  --sage-rgb: 163 189 185;
+  --terracotta-rgb: 222 159 124;
+  --shadow-rgb: 10 17 32;   /* the logo's "paper layer" shadow colour — never a glow */
+
+  /* ---- Semantic tokens (default = dark / navy ground) -----------------
+     Re-mapped by .theme-dark / .theme-deep / .theme-light / .theme-paper (base.css). */
+  --primary: var(--navy);
+  --secondary: var(--sage);
+  --background: var(--navy);
+  --surface: var(--navy-soft);
+  --surface-2: rgb(var(--cream-rgb) / .04);
+  --text: var(--cream);
+  --heading: var(--cream);
+  --muted: rgb(var(--cream-rgb) / .72);
+  --faint: rgb(var(--cream-rgb) / .58);
+  --border: rgb(var(--cream-rgb) / .14);
+  --border-strong: rgb(var(--cream-rgb) / .28);
+  --accent: var(--terracotta);        /* warm human accent: dots, lines, key highlights */
+  --accent-text: var(--terracotta);   /* accent used for small text (AA) */
+  --interactive: var(--sage);         /* links, interactive accents */
+  --hover: var(--cream);
+  --on-accent: var(--navy);           /* text on terracotta / sage fills */
+  --btn-bg: var(--cream);
+  --btn-fg: var(--navy);
+  --focus: var(--sage);
+  --selection: rgb(var(--terracotta-rgb) / .38);
+  --glass: rgb(var(--navy-rgb) / .72);
+  --glass-border: rgb(var(--cream-rgb) / .1);
+  --sheen: rgb(var(--cream-rgb) / .07);
+  --line: var(--terracotta);
+  --doorway-frame: var(--cream);
+  --doorway-body: var(--sage);
+  --cta-bg: var(--navy-soft);
+  --cta-shadow: var(--shadow-dark-2);
+  --accent-btn-fill: var(--cream);
+  --accent-btn-fill-fg: var(--navy);
+  --field-bg: rgb(var(--cream-rgb) / .06);
+  --field-bg-focus: rgb(var(--cream-rgb) / .09);
+  --field-fg: var(--cream);
+  --field-border: rgb(var(--cream-rgb) / .2);
+  --field-border-hover: rgb(var(--cream-rgb) / .36);
+  --field-border-focus: var(--sage);
+  --field-placeholder: rgb(var(--cream-rgb) / .5);
+  --field-shadow: none;
+  --error: var(--terracotta);
+  --error-bg: rgb(var(--terracotta-rgb) / .08);
+  --icon-valid-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23A3BDB9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4.5 10.5 3.6 3.6 7.4-8'/%3E%3C/svg%3E");
+  --icon-valid-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%235F807C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4.5 10.5 3.6 3.6 7.4-8'/%3E%3C/svg%3E");
+  --valid-icon: var(--icon-valid-dark);
+  --grain: var(--grain-dark);
+
+  /* ---- 3D lighting (shared with the WebGL scene kit) ------------------- */
+  --light-key: #FFF4E8;      /* warm cream key light */
+  --light-fill: #A3BDB9;     /* sage fill */
+  --light-rim: #DE9F7C;      /* terracotta rim */
+  --light-ambient: #24344F;  /* navy ambient */
+  --fog: #1A2842;
+  --glass-tint: #EAF1EF;
+
+  /* ---- Typography ------------------------------------------------------ */
+  --font-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Instrument Serif", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+
+  /* fluid scale — min @320px, max @1440–1600px */
+  --fs-display-xl: clamp(2.5rem, 1.05rem + 6.6vw, 7.25rem);  /* hero */
+  --fs-display: clamp(2.35rem, 1.2rem + 4.6vw, 5.5rem);      /* page heroes */
+  --fs-h1: clamp(2.1rem, 1.35rem + 3.2vw, 4.25rem);
+  --fs-h2: clamp(1.85rem, 1.25rem + 2.45vw, 3.4rem);         /* section headings */
+  --fs-h3: clamp(1.35rem, 1.12rem + 0.95vw, 1.9rem);
+  --fs-h4: clamp(1.125rem, 1.03rem + 0.4vw, 1.3rem);
+  --fs-lead: clamp(1.125rem, 1.02rem + 0.5vw, 1.4rem);
+  --fs-body: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --fs-small: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);   /* 15–16px: supporting copy stays readable next to display type */
+  --fs-xs: 0.8125rem;
+  --fs-label: 0.75rem;
+  --fs-nav: 0.9375rem;
+  --fs-button: 0.9375rem;
+  --fs-price: clamp(3.5rem, 2.2rem + 5.2vw, 7rem);
+  --fs-numeral: clamp(3.75rem, 2rem + 7vw, 9rem);            /* big serif numerals */
+
+  --lh-tight: 0.98;
+  --lh-heading: 1.08;
+  --lh-snug: 1.3;
+  --lh-body: 1.65;
+
+  --tracking-display: -0.038em;
+  --tracking-heading: -0.028em;
+  --tracking-tight: -0.012em;
+  --tracking-label: 0.16em;
+
+  --measure: 64ch;
+  --measure-narrow: 46ch;
+
+  /* ---- Spacing --------------------------------------------------------- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs: 0.75rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 8rem;
+  /* fluid rhythm */
+  --gutter: clamp(1.25rem, 0.55rem + 3.2vw, 3.5rem);        /* page side padding */
+  --grid-gap: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  --section-y: clamp(5rem, 3rem + 8vw, 10.5rem);             /* section vertical padding */
+  --section-y-s: clamp(3.5rem, 2.4rem + 4.5vw, 6.5rem);
+  --stack: clamp(1.25rem, 1rem + 1vw, 2rem);                 /* default vertical flow gap */
+
+  --container: 84rem;         /* 1344px */
+  --container-wide: 98rem;    /* 1568px */
+  --container-narrow: 50rem;  /* 800px */
+  --header-h: 5.25rem;
+  --header-h-scrolled: 4rem;
+
+  /* ---- Radii — the arch language --------------------------------------- */
+  --radius-xs: 6px;
+  --radius-s: 10px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --radius-xl: 36px;
+  --radius-pill: 999px;
+  --radius-arch: 999px 999px var(--radius-m) var(--radius-m); /* use on fixed-aspect media; cards use .card--arch */
+
+  /* ---- Shadows — soft navy "paper layers" (never glows) ---------------- */
+  --shadow-1: 0 1px 2px rgb(var(--shadow-rgb) / .10), 0 2px 6px rgb(var(--shadow-rgb) / .08);
+  --shadow-2: 0 2px 4px rgb(var(--shadow-rgb) / .08), 0 10px 24px -6px rgb(var(--shadow-rgb) / .20);
+  --shadow-3: 0 4px 10px rgb(var(--shadow-rgb) / .10), 0 24px 48px -12px rgb(var(--shadow-rgb) / .32);
+  --shadow-4: 0 8px 18px rgb(var(--shadow-rgb) / .14), 0 44px 80px -20px rgb(var(--shadow-rgb) / .45);
+  --shadow-dark-1: 0 2px 6px rgb(var(--shadow-rgb) / .35), 0 10px 26px -8px rgb(var(--shadow-rgb) / .55);
+  --shadow-dark-2: 0 6px 16px rgb(var(--shadow-rgb) / .38), 0 30px 60px -18px rgb(var(--shadow-rgb) / .7);
+  --shadow-form: 0 10px 18px rgb(var(--shadow-rgb) / .5);   /* brand-form drop shadow (disc / arch) */
+
+  /* ---- Motion ---------------------------------------------------------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);        /* default: calm, confident deceleration */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);    /* tiny overshoot — magnetic / icons only */
+  --dur-1: 120ms;   /* colour, opacity micro */
+  --dur-2: 220ms;   /* hover */
+  --dur-3: 420ms;   /* component transitions */
+  --dur-4: 700ms;   /* reveals */
+  --dur-5: 1100ms;  /* line reveals / draws */
+  --stagger: 80ms;
+
+  /* ---- Layers ---------------------------------------------------------- */
+  --z-below: -1;
+  --z-base: 1;
+  --z-raised: 10;
+  --z-sticky: 50;
+  --z-header: 100;
+  --z-menu: 90;          /* mobile menu sits under the header so the close button stays visible */
+  --z-dropdown: 110;
+  --z-modal: 200;
+  --z-transition: 1000;
+  --z-skip: 1100;
+}

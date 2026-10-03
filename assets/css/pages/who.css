@@ -1,0 +1,667 @@
+/* ==========================================================================
+   HCLabs — Who it's for (/who-its-for/)
+   The page's own identity: FOUR DOORWAYS. The hero is a row of the logo's doorways (live 3D, with a static
+   SVG twin) threaded by the brand line; each situation then gets its own chapter and its own illustration,
+   framed in an arch window:
+     01 first hire  → the Starter Pack documents stacked as the foundations a doorway stands on
+     02 growing     → a team that grows tier by tier, held up by arches, finally framed by one doorway
+     03 documents   → a page scanned for gaps, then brought up to date
+     04 challenges  → a tangled line between two people that resolves into the brand's arch
+   Every chapter rises over the last as a dome (the doorway), as on the homepage. Tokens only (no raw hex).
+   On desktop each chapter's illustration is pinned beside its copy while the copy scrolls past.
+   ========================================================================== */
+
+.page-who {
+  --dome: clamp(2.75rem, 1rem + 6vw, 7.5rem);
+  --h-display: clamp(2.2rem, 1.3rem + 3.3vw, 4.4rem);
+  --door-h: min(clamp(8.5rem, 5rem + 12vw, 19rem), 31svh);
+}
+.who-symbols { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* the shared reveal leaves clip-path: inset(0) on revealed elements, which cuts the shadows of what they hold (the
+   buttons, the "How HCLabs helps" tile) into a visible box. This page only uses rise/fade reveals: release it. */
+html.js .page-who [data-reveal].is-in { clip-path: none; }
+.fig-head { fill: var(--fig-head, var(--terracotta)); }
+.fig-body { fill: var(--fig-body, var(--sage)); }
+.door-frame { fill: var(--door-frame, var(--cream)); }
+.page-who .nowrap { white-space: nowrap; }
+
+/* ==========================================================================
+   HERO — four doorways
+   ========================================================================== */
+.who-hero {
+  --disc: clamp(20rem, 8rem + 22vw, 34rem);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px) + clamp(1rem, .25rem + 2.4vw, 3.25rem));
+  padding-bottom: calc(var(--dome) + clamp(1.5rem, .75rem + 2vw, 3rem));
+}
+/* a quiet light where the doorways stand, present from the first paint */
+.who-hero::before {
+  content: "";
+  position: absolute; z-index: 0;
+  left: -10%; right: -10%; bottom: 0; height: 70%;
+  background:
+    radial-gradient(40% 55% at 50% 78%, rgb(var(--sage-rgb) / .1), transparent 72%),
+    radial-gradient(26% 34% at 82% 22%, rgb(var(--terracotta-rgb) / .06), transparent 70%);
+  pointer-events: none;
+}
+.who-hero__stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.who-hero__stage .hc3d-canvas {
+  -webkit-mask-image: linear-gradient(#000 calc(100% - var(--dome) * 1.05), transparent calc(100% - var(--dome) * .35));
+  mask-image: linear-gradient(#000 calc(100% - var(--dome) * 1.05), transparent calc(100% - var(--dome) * .35));
+}
+.who-hero__inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; gap: clamp(2.5rem, 1rem + 4vw, 4.25rem); width: 100%; }
+.who-hero__copy { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(1rem, .7rem + 1vw, 1.6rem); }
+.who-hero__copy .breadcrumbs { margin-bottom: clamp(.5rem, 2vw, 1.75rem); }
+.who-hero__title {
+  font-size: clamp(2.8rem, 1.2rem + 4.6vw, 5.75rem);
+  font-weight: 780;
+  line-height: .96;
+  letter-spacing: -0.044em;
+  color: var(--heading);
+  text-wrap: balance;
+}
+.who-hero__title em { color: var(--terracotta); padding-right: .05em; }
+.who-hero__lead { max-width: 40rem; color: rgb(var(--cream-rgb) / .78); }
+@media (max-width: 47.99em) { .who-hero__lead { max-width: 34rem; } }
+
+/* the brand disc (static twin of the 3D disc; the scene reads this element's box to place its own) */
+.who-hero__disc {
+  --size: var(--disc);
+  position: absolute; z-index: 1;
+  right: calc(var(--size) * -.3);
+  top: calc(var(--size) * -.28);
+  pointer-events: none;
+  transition: opacity .45s var(--ease-out);
+}
+@media (max-width: 69.99em) {
+  .who-hero { --disc: clamp(11rem, 5rem + 17vw, 20rem); }
+  .who-hero__disc { top: calc(var(--header-h) + .75rem); right: calc(var(--size) * -.4); }
+  .who-hero__lead { max-width: min(40rem, 100% - var(--disc) * .7); }
+}
+@media (max-width: 39.99em) { .who-hero__disc { display: none; } .who-hero__lead { max-width: 34rem; } }
+
+/* ---- the row of doorways (each whole column is one link) ---- */
+.who-doors { margin-top: auto; }
+.who-doors__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2.25rem, 1.5rem + 3vw, 3rem) var(--grid-gap); }
+@media (min-width: 48em) { .who-doors__list { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.who-doors__item { display: flex; min-width: 0; }
+.who-door {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: var(--text);
+  border-radius: var(--radius-m);
+  -webkit-tap-highlight-color: transparent;
+}
+.who-door:focus-visible { outline-offset: 8px; }
+.who-door__space { position: relative; display: block; height: var(--door-h); }
+
+/* static doorway art — the 3D world's twin (shown before the world arrives, and kept when it cannot run) */
+.wd-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transition: opacity .45s var(--ease-out); }
+.wd-art { --door-frame: var(--cream); --fig-head: var(--terracotta); --fig-body: var(--sage); }
+.wd-art use.wd-frame { filter: drop-shadow(0 .6px 1.6px rgb(var(--shadow-rgb) / .55)); }
+.wd-art g { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .9s var(--ease-out), opacity .5s var(--ease-out); }
+.wd-sheet rect { fill: var(--cream); }
+.wd-sheet--2 rect { fill: var(--paper); }
+.wd-sheet--3 rect { fill: var(--sand); }
+.wd-sheet--3 { transform: rotate(-10deg) translate(-1.4px, .3px); }
+.wd-sheet--2 { transform: rotate(-4deg) translate(-.6px, 0); }
+.wd-sheet--1 { transform: rotate(4deg); }
+.wd-rule { stroke: var(--clay); stroke-width: .9; stroke-linecap: round; }
+.wd-lines { stroke: rgb(var(--navy-rgb) / .2); stroke-width: .8; stroke-linecap: round; }
+.wd-check-bg { fill: var(--sage); }
+.wd-check { fill: none; stroke: var(--navy); stroke-width: .75; stroke-linecap: round; stroke-linejoin: round; }
+.wd-arc { fill: none; stroke: var(--terracotta); stroke-width: .8; stroke-linecap: round; stroke-dasharray: 1; }
+.wd-arc-dot { fill: var(--terracotta); }
+.wd-extra { opacity: 0; transform: translateY(3px) scale(.6); }
+
+/* the brand line threads the thresholds: one wave per column that joins its neighbours at the gap centres */
+.who-door__line {
+  position: absolute;
+  left: calc(var(--grid-gap) / -2); right: calc(var(--grid-gap) / -2);
+  top: calc(var(--door-h) * .92); height: calc(var(--door-h) * .1);
+  pointer-events: none;
+  transition: opacity .45s var(--ease-out);
+}
+.who-door__line svg { width: 100%; height: 100%; overflow: visible; }
+.who-door__line path { fill: none; stroke: var(--terracotta); stroke-width: 2; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.who-door__line::before, .who-door__line::after { /* tails to the viewport edges on the first / last door of a row */
+  content: ""; position: absolute; top: calc(9 / 24 * 100% - 1px); height: 2px; width: 100vw; background: var(--terracotta); display: none;
+}
+.who-door__line::before { right: 100%; }
+.who-door__line::after { left: 100%; }
+.who-doors__item:nth-child(odd) .who-door__line::before, .who-doors__item:nth-child(even) .who-door__line::after { display: block; }
+@media (min-width: 48em) {
+  .who-doors__item .who-door__line::before, .who-doors__item .who-door__line::after { display: none; }
+  .who-doors__item:first-child .who-door__line::before, .who-doors__item:last-child .who-door__line::after { display: block; }
+}
+
+/* the fallback art's visibility is choreographed by who.js: hidden while the 3D world is expected, shown with its
+   own entrance only if the world is late or unavailable, removed the moment the world is live */
+html.js .who-hero :is(.wd-art, .who-door__line, .who-hero__disc) { opacity: 0; }
+html.js .who-hero.fb-on :is(.wd-art, .who-door__line, .who-hero__disc) { opacity: 1; }
+html.js .who-hero.fb-on.is-live :is(.wd-art, .who-door__line, .who-hero__disc) { opacity: 0; }
+html.js-failed .who-hero :is(.wd-art, .who-door__line, .who-hero__disc) { opacity: 1 !important; }
+.who-hero.is-fb-in .wd-art { animation: wd-rise 1.4s var(--ease-out-expo) both; }
+.who-hero.is-fb-in .who-doors__item:nth-child(2) .wd-art { animation-delay: .1s; }
+.who-hero.is-fb-in .who-doors__item:nth-child(3) .wd-art { animation-delay: .2s; }
+.who-hero.is-fb-in .who-doors__item:nth-child(4) .wd-art { animation-delay: .3s; }
+.who-hero.is-fb-in .who-door__line { animation: wd-wipe 2s var(--ease-in-out) .35s both; }
+@keyframes wd-rise { from { transform: translateY(14%); opacity: 0; } }
+@keyframes wd-wipe { from { clip-path: inset(-50% 100% -50% 0); } to { clip-path: inset(-50% 0 -50% 0); } }
+
+/* labels under each doorway */
+.who-door__meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: .75rem;
+  row-gap: .3rem;
+  padding-top: clamp(1.1rem, .8rem + 1vw, 1.6rem);
+}
+.who-door__num { font-family: var(--font-serif); font-style: italic; font-size: 1.55rem; line-height: 1; color: var(--terracotta); }
+.who-door__title {
+  grid-column: 1;
+  font-size: clamp(1rem, .92rem + .35vw, 1.2rem);
+  font-weight: 680;
+  letter-spacing: -0.016em;
+  line-height: 1.25;
+  color: var(--heading);
+  text-wrap: balance;
+  background: linear-gradient(var(--terracotta), var(--terracotta)) 0 100% / 0% 1.5px no-repeat;
+  padding-bottom: .2em;
+  justify-self: start;
+  transition: background-size .6s var(--ease-out);
+}
+.who-door__go {
+  grid-column: 2; grid-row: 1 / span 2;
+  display: inline-grid; place-items: center;
+  width: 2.5rem; height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  transition: background-color var(--dur-3), border-color var(--dur-3), color var(--dur-3), transform .6s var(--ease-spring);
+}
+.who-door__go .arrow { transform: rotate(90deg); }
+.who-door:is(:hover, :focus-visible) .who-door__title { background-size: 100% 1.5px; }
+.who-door:is(:hover, :focus-visible) .who-door__go { background: var(--terracotta); border-color: var(--terracotta); color: var(--navy); transform: translateY(3px); }
+.who-door:is(:hover, :focus-visible) .who-door__go .arrow::before { transform: translate3d(130%, 0, 0); }
+.who-door:is(:hover, :focus-visible) .who-door__go .arrow::after { transform: none; }
+@media (max-width: 29.99em) {
+  .wd-walker { translate: 4.5px 0; }                /* small phones: the waiting person stays inside the screen */
+  .who-doors .who-door:is(:hover, :focus-visible, .is-on) .wd-walker { transform: translateX(26px); }
+  .who-door__go { width: 2.1rem; height: 2.1rem; }
+  .who-door__num { font-size: 1.35rem; }
+  .who-door__title { font-size: .98rem; }
+}
+
+/* hover / focus: each doorway's own small story (the 3D world does the same when it is live) */
+.who-door:is(:hover, :focus-visible, .is-on) .wd-walker { transform: translateX(30.5px); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-f--1 { transform: translateY(-1.2px); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-f--2 { transform: translateY(-1.8px); transition-delay: .06s; }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-f--3 { transform: translateY(-2.4px); transition-delay: .12s; }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-extra { opacity: 1; transform: none; transition-delay: .18s; }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-sheet--3 { transform: rotate(-19deg) translate(-4px, .6px); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-sheet--2 { transform: rotate(-9deg) translate(-2px, 0); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-sheet--1 { transform: rotate(8deg) translate(2px, -1.5px); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-pair--a { transform: translateX(1.6px); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-pair--b { transform: translateX(-1.6px); }
+.who-door:is(:hover, :focus-visible, .is-on) .wd-arc { animation: wd-draw 1.1s var(--ease-in-out) both; }
+@keyframes wd-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* phones: two rows of doors */
+@media (max-width: 47.99em) {
+  .who-hero { min-height: 0; }
+  .who-doors { margin-top: var(--space-s); }
+}
+/* portrait tablets: a full-height hero would leave a void between the copy and one row of small doors — the hero
+   sizes to its content instead, and the first chapter's dome rises into view */
+@media (min-width: 48em) and (max-aspect-ratio: 4/5) {
+  .who-hero { min-height: 0; }
+  .who-hero__inner { gap: clamp(4rem, 2rem + 5vw, 6rem); }
+}
+
+/* ==========================================================================
+   CHAPTERS — shared
+   ========================================================================== */
+.who-ch {
+  position: relative;
+  border-radius: 50% 50% 0 0 / var(--dome) var(--dome) 0 0;
+  margin-top: calc(var(--dome) * -1);
+  padding-top: calc(var(--dome) + clamp(2.5rem, 1rem + 5vw, 6.5rem));
+  padding-bottom: calc(var(--dome) + clamp(3rem, 1.5rem + 5vw, 7rem));
+}
+.who-ch--first { z-index: 1; }
+.who-ch--grow { z-index: 2; }
+.who-ch--docs { z-index: 3; }
+.who-ch--issues { z-index: 4; }
+.who-close { z-index: 5; }
+
+.who-ch__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "visual" "body";
+  gap: clamp(2.25rem, 1.5rem + 3vw, 3.5rem);
+}
+.who-ch__head { grid-area: head; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); }
+.who-ch__visual { grid-area: visual; min-width: 0; }
+.who-ch__body { grid-area: body; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-m); min-width: 0; }
+@media (min-width: 64em) {
+  .who-ch__grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "visual head" "visual body";
+    column-gap: clamp(3.5rem, 1rem + 5vw, 7.5rem);
+    row-gap: var(--space-l);
+    align-items: start;
+  }
+  .who-ch--grow .who-ch__grid, .who-ch--issues .who-ch__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-areas: "head visual" "body visual";
+  }
+  .who-ch__visual { align-self: center; }
+}
+/* desktop with room to spare: the illustration hangs from the chapter's top line and stays pinned while the copy
+   scrolls past, so its scroll story plays (and then rests) fully in view. Each illustration is capped to fit the
+   viewport under the floating header (--fit); who.js measures their unpinned position for the scroll story. */
+@media (min-width: 64em) and (min-height: 42em) {
+  .page-who {
+    --pin-gap: clamp(1rem, 3.2svh, 2.5rem);
+    --fit: calc(100svh - var(--header-h) - var(--pin-gap) * 2);
+  }
+  .who-ch__visual { align-self: start; position: sticky; top: calc(var(--header-h) + var(--pin-gap)); }
+  /* (the size caps sit after the illustration rules, at the end of this file) */
+}
+
+.who-ch__num {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(4.5rem, 2.5rem + 6vw, 8.5rem);
+  line-height: .74;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  margin-bottom: clamp(.25rem, 1vw, .75rem);
+}
+.who-ch__title {
+  font-size: var(--h-display);
+  font-weight: 750;
+  line-height: 1.02;
+  letter-spacing: -0.036em;
+  color: var(--heading);
+  text-wrap: balance;
+  max-width: 13ch;
+}
+.who-ch__title em { color: var(--accent); }
+.who-ch--first .who-ch__title em, .who-ch--docs .who-ch__title em { color: var(--clay); }
+
+/* "How HCLabs helps" — the supplied line for each situation, signed with the doorway mark on an arch tile */
+.who-ch__help {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: clamp(.9rem, .6rem + 1vw, 1.35rem);
+  row-gap: .4rem;
+  align-items: start;
+  margin-top: var(--space-2xs);
+  padding-top: var(--space-m);
+  border-top: 1px solid var(--border-strong);
+  max-width: 34rem;
+}
+.who-ch__help::before {
+  content: "";
+  grid-row: 1 / span 2;
+  width: 3.1rem; height: 3.35rem;
+  border-radius: 999px 999px 10px 10px;
+  background: url("/assets/logo/mark-dark.svg") 50% 68% / 1.45rem auto no-repeat, var(--help-tile, var(--navy));
+  box-shadow: var(--help-shadow, var(--shadow-2));
+}
+.who-ch--grow .who-ch__help, .who-ch--issues .who-ch__help { --help-tile: rgb(var(--cream-rgb) / .09); --help-shadow: inset 0 0 0 1px rgb(var(--cream-rgb) / .1); }
+.who-ch__help-k { padding-top: .2rem; font-size: var(--fs-label); font-weight: 650; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--interactive); }
+.who-ch__help-v { font-size: clamp(1.15rem, 1rem + .62vw, 1.5rem); font-weight: 650; letter-spacing: -0.02em; line-height: 1.3; color: var(--heading); text-wrap: balance; }
+
+.who-ch__text { font-size: var(--fs-lead); line-height: 1.55; color: var(--muted); max-width: 36rem; }
+.who-ch__text--muted { font-size: var(--fs-body); line-height: 1.65; }
+.who-ch__cta { margin-top: var(--space-2xs); }
+.who-ch__tag { margin-top: var(--space-2xs); }
+.who-ch__consult { margin-top: var(--space-2xs); max-width: 100%; }
+/* inline (not inline-flex) so a wrapped label hugs its text and the arrow stays attached to the last word: the link
+   is nowrap (no break between the label and the arrow), the label itself wraps normally */
+.who-ch__consult .link-arrow { display: inline; font-size: var(--fs-small); line-height: 1.9; white-space: nowrap; }
+.who-ch__consult .link-arrow > span:not(.arrow) { white-space: normal; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.who-ch__consult .link-arrow .arrow { margin-left: .55rem; vertical-align: -.17em; }
+
+/* related pages: rows with a kicker, a title and a round arrow */
+.who-links__label { margin-top: var(--space-s); font-size: var(--fs-label); font-weight: 650; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--muted); }
+.who-links { width: 100%; max-width: 36rem; border-top: 1px solid var(--border-strong); margin-top: calc(var(--space-m) * -.4); }
+.who-links > li { border-bottom: 1px solid var(--border); }
+.who-link {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas: "k price go" "t price go";
+  align-items: center;
+  column-gap: clamp(.75rem, 2vw, 1.25rem);
+  row-gap: .15rem;
+  padding: clamp(.9rem, .7rem + .6vw, 1.2rem) 0;
+  color: var(--text);
+}
+.who-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1.5px; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; transition: transform .7s var(--ease-out); }
+.who-link__k { grid-area: k; font-size: .6875rem; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.who-link__t { grid-area: t; font-size: clamp(1.02rem, .95rem + .3vw, 1.18rem); font-weight: 650; letter-spacing: -0.016em; line-height: 1.3; color: var(--heading); transition: transform .6s var(--ease-out); }
+.who-link__price { grid-area: price; font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem); font-weight: 720; letter-spacing: -0.03em; line-height: 1; color: var(--heading); font-variant-numeric: tabular-nums lining-nums; }
+.who-link__cur { font-size: .6em; vertical-align: .5em; margin-right: .06em; color: var(--accent); font-weight: 650; }
+.who-link__go { grid-area: go; display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 1px solid var(--border-strong); color: var(--text); transition: background-color var(--dur-3), border-color var(--dur-3), color var(--dur-3), transform .6s var(--ease-spring); }
+.who-link:is(:hover, :focus-visible)::after { transform: scaleX(1); }
+.who-link:is(:hover, :focus-visible) .who-link__t { transform: translateX(.35rem); }
+.who-link:is(:hover, :focus-visible) .who-link__go { background: var(--accent); border-color: var(--accent); color: var(--on-accent); transform: rotate(-45deg); }
+.theme-light .who-link:is(:hover, :focus-visible) .who-link__go, .theme-paper .who-link:is(:hover, :focus-visible) .who-link__go { background: var(--navy); border-color: var(--navy); color: var(--cream); }
+.who-link:focus-visible { outline-offset: 4px; border-radius: 6px; }
+
+
+/* ==========================================================================
+   01 · FIRST HIRE — the foundations
+   ========================================================================== */
+.found { position: relative; max-width: 38rem; margin-inline: auto; }
+.found__window {
+  --r: var(--radius-l);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* top: 15% of the width (= .3 × the arch radius) — a percentage, so it is right from the first paint and never
+     changes the page height from inside site.js's arch ResizeObserver */
+  padding: 15% clamp(1rem, 5.5%, 2.75rem) clamp(1.5rem, 7%, 3rem);
+  border-radius: var(--aw, 50%) var(--aw, 50%) var(--r) var(--r) / var(--aw, 40%) var(--aw, 40%) var(--r) var(--r);
+  background: radial-gradient(90% 60% at 50% 100%, rgb(var(--sage-rgb) / .12), transparent 70%), var(--navy);
+  background-image: radial-gradient(90% 60% at 50% 100%, rgb(var(--sage-rgb) / .12), transparent 70%), var(--grain-dark);
+  box-shadow: var(--shadow-3), inset 0 1px 0 rgb(var(--cream-rgb) / .06);
+  overflow: hidden;
+  --text: var(--navy);
+}
+.found__glow { position: absolute; z-index: -1; left: 20%; right: 20%; top: 10%; height: 40%; border-radius: 50%; background: radial-gradient(closest-side, rgb(var(--terracotta-rgb) / .12), transparent); pointer-events: none; }
+.found__door { width: min(48%, 15rem); margin-bottom: -1px; position: relative; z-index: 2; }
+.found__door svg { width: 100%; height: auto; overflow: visible; --door-frame: var(--cream); --fig-head: var(--terracotta); --fig-body: var(--sage); }
+.found__frame { filter: drop-shadow(0 1px 1.5px rgb(var(--shadow-rgb) / .5)); }
+.found__door g, .found__door use { transform-box: fill-box; transform-origin: 50% 100%; }
+
+.found__stack { position: relative; z-index: 1; display: flex; flex-direction: column-reverse; gap: 4px; width: 100%; }
+.found__slab { --slab: var(--cream); display: block; }
+.found__slab:nth-child(even) { --slab: var(--paper); }
+.found__slab:nth-child(3n) { --slab: var(--sand); }
+.found__slab a {
+  display: grid;
+  grid-template-columns: 2.1rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: .65rem;
+  min-height: clamp(2.45rem, 2.1rem + .9vw, 3.05rem);
+  padding: .45rem .5rem .45rem .95rem;
+  border-radius: 10px;
+  background: var(--slab);
+  color: var(--navy);
+  box-shadow: 0 1px 0 rgb(var(--shadow-rgb) / .2), 0 10px 16px -12px rgb(var(--shadow-rgb) / .9);
+  transform: translate3d(var(--jx, 0%), 0, 0);
+  transition: transform .7s var(--ease-out), background-color .4s var(--ease-out), box-shadow .5s var(--ease-out);
+}
+.found__n { font-family: var(--font-serif); font-style: italic; font-size: 1.3rem; line-height: 1; color: var(--clay-ink); }
+.found__t { font-size: clamp(.84rem, .8rem + .2vw, .95rem); font-weight: 650; letter-spacing: -0.008em; line-height: 1.25; color: var(--navy); }
+.found__go { display: inline-grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--navy); color: var(--cream); opacity: 0; transform: translateX(-6px) scale(.8); transition: opacity .35s var(--ease-out), transform .6s var(--ease-spring); }
+.found__go .arrow { width: .85em; height: .85em; font-size: .9rem; }
+.found__slab a:is(:hover, :focus-visible) { transform: translate3d(calc(var(--jx, 0%) + 3.5%), -2px, 0); background: var(--cream-bright); box-shadow: 0 1px 0 rgb(var(--shadow-rgb) / .2), 0 18px 26px -14px rgb(var(--shadow-rgb) / .95); }
+.found__slab a:is(:hover, :focus-visible) .found__go { opacity: 1; transform: none; }
+.found__slab a:focus-visible { outline-offset: 3px; outline-color: var(--sage); }
+/* touch screens have no hover: every document keeps a quiet arrow so it reads as a link */
+@media (hover: none) {
+  .found__go { opacity: 1; transform: none; width: 1.3rem; height: 1.3rem; background: transparent; color: var(--clay-ink); }
+  .found__go .arrow { font-size: .95rem; }
+}
+/* small phones: tighter frame and rows so each title keeps to one or two lines */
+@media (max-width: 29.99em) {
+  .found__window { padding-inline: .6rem; }
+  .found__slab a { grid-template-columns: 1.55rem minmax(0, 1fr) auto; column-gap: .5rem; padding: .5rem .45rem .5rem .75rem; }
+  .found__n { font-size: 1.15rem; }
+  .found__t { font-size: .84rem; }
+}
+
+/* ==========================================================================
+   02 · GROWING — the team grows, held up by arches, framed by one doorway
+   ========================================================================== */
+.team { position: relative; max-width: 38rem; margin-inline: auto; }
+.team__window {
+  --r: var(--radius-l);
+  position: relative;
+  aspect-ratio: 400 / 420;
+  border-radius: var(--aw, 50%) var(--aw, 50%) var(--r) var(--r) / var(--aw, 40%) var(--aw, 40%) var(--r) var(--r);
+  background-color: var(--paper);
+  background-image: radial-gradient(80% 55% at 50% 100%, rgb(var(--sage-rgb) / .22), transparent 70%), var(--grain-light);
+  box-shadow: var(--shadow-dark-2);
+  overflow: hidden;
+}
+.team__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; --fig-head: var(--terracotta-shape); --fig-body: var(--sage-brand); }
+.team__floor { stroke: rgb(var(--navy-rgb) / .16); stroke-width: 1.5; stroke-linecap: round; }
+.team__arch { fill: none; stroke: var(--sage-deep); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--off, 0); transition: stroke .5s var(--ease-out), stroke-width .5s var(--ease-out); }
+.team__ring { fill: none; stroke: var(--clay); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--off, 0); opacity: .75; transition: opacity .5s var(--ease-out), stroke-width .5s var(--ease-out); }
+.team__dot { fill: var(--terracotta); transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--s, 1)); }
+.team__p { transform-box: fill-box; transform-origin: 50% 100%; transform: translateY(calc((1 - var(--s, 1)) * 18px)) scale(var(--s, 1)); opacity: var(--o, 1); }
+.team__p--0 use { filter: drop-shadow(0 2px 3px rgb(var(--shadow-rgb) / .18)); }
+/* link hints */
+.team.hint-people .team__p--2 { animation: team-bob 1.1s var(--ease-in-out) infinite; animation-delay: calc(var(--k) * 90ms); }
+.team.hint-structure .team__arch { stroke: var(--clay); stroke-width: 3; }
+.team.hint-ring .team__ring { opacity: 1; stroke-width: 3.2; }
+.team.hint-ring .team__dot { animation: team-pulse 1.2s var(--ease-in-out) infinite; }
+@keyframes team-bob { 50% { translate: 0 -5px; } }
+@keyframes team-pulse { 50% { scale: 1.35; } }
+
+/* ==========================================================================
+   03 · DOCUMENTATION — identify the gaps, bring it up to date
+   ========================================================================== */
+.docs { position: relative; max-width: 38rem; margin-inline: auto; }
+.docs__window {
+  --r: var(--radius-l);
+  position: relative;
+  aspect-ratio: 400 / 460;
+  border-radius: var(--aw, 50%) var(--aw, 50%) var(--r) var(--r) / var(--aw, 40%) var(--aw, 40%) var(--r) var(--r);
+  background-color: var(--navy);
+  background-image: radial-gradient(85% 55% at 50% 100%, rgb(var(--sage-rgb) / .14), transparent 70%), var(--grain-dark);
+  box-shadow: var(--shadow-3), inset 0 1px 0 rgb(var(--cream-rgb) / .06);
+  overflow: hidden;
+}
+.docs__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.docs__svg feDropShadow { flood-color: rgb(var(--shadow-rgb)); flood-opacity: .5; }
+.docs__floor { stroke: rgb(var(--cream-rgb) / .14); stroke-width: 1.5; stroke-linecap: round; }
+.docs__sheet { transform-box: view-box; transform-origin: 200px 364px; transition: transform 1s var(--ease-out); }
+.docs__sheet rect { fill: var(--cream-bright); }
+.docs__sheet--2 rect { fill: var(--paper); }
+.docs__sheet--3 rect { fill: var(--sand); }
+.docs__sheet--3 { transform: rotate(-9deg) translate(-6px, 2px); }
+.docs__sheet--2 { transform: rotate(-4deg) translate(-2px, 0); }
+.docs__sheet--1 { transform: rotate(2deg); }
+.docs__rule { stroke: var(--clay); stroke-width: 6; stroke-linecap: round; }
+.docs__title { stroke: rgb(var(--navy-rgb) / .62); stroke-width: 10; stroke-linecap: round; }
+.docs__row { stroke: rgb(var(--navy-rgb) / .15); stroke-width: 7; stroke-linecap: round; }
+.docs__hole { fill: rgb(var(--terracotta-rgb) / .1); stroke: var(--clay); stroke-width: 1.4; stroke-dasharray: 4 3; opacity: var(--found, .1); transition: opacity .4s var(--ease-out); }
+.docs__fill { stroke: var(--sage-deep); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--fill, 1)); }
+.docs__mark { fill: var(--clay); transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--mark, .65)); }
+.docs__scan { transform: translateY(var(--scan-y, 150px)); opacity: var(--scan-o, 0); }
+.docs__scan-band { fill: rgb(var(--sage-rgb) / .22); }
+.docs__scan-line { stroke: var(--sage-deep); stroke-width: 2; }
+.docs__seal { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--seal, 1)) rotate(calc((1 - var(--seal, 1)) * -40deg)); }
+.docs__seal circle { fill: var(--sage); }
+.docs__seal path { fill: none; stroke: var(--navy); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.docs__state {
+  position: absolute; left: 50%; bottom: clamp(1rem, 4%, 1.6rem);
+  display: grid;
+  transform: translateX(-50%);
+  padding: .5rem 1rem .5rem .9rem;
+  border-radius: var(--radius-pill);
+  background: rgb(var(--navy-rgb) / .78);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgb(var(--cream-rgb) / .12);
+  font-size: var(--fs-xs); font-weight: 650; letter-spacing: .02em; color: var(--cream);
+  white-space: nowrap;
+}
+.docs__state > span { grid-area: 1 / 1; display: inline-flex; align-items: center; gap: .55rem; transition: opacity .4s var(--ease-out), transform .5s var(--ease-out); }
+.docs__state > span::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); }
+.docs__state-b::before { background: var(--sage) !important; }
+.docs__state-b { opacity: 0; transform: translateY(6px); }
+.docs.is-done .docs__state-a { opacity: 0; transform: translateY(-6px); }
+.docs.is-done .docs__state-b { opacity: 1; transform: none; }
+/* link hints */
+.docs.hint-scan .docs__scan { animation: docs-scan 1.6s var(--ease-in-out) infinite; }
+@keyframes docs-scan { 0% { transform: translateY(120px); opacity: 0; } 12%, 88% { opacity: 1; } 100% { transform: translateY(350px); opacity: 0; } }
+.docs.hint-update .docs__fill { stroke: var(--sage); }
+.docs.hint-update .docs__sheet--1 { transform: rotate(0deg) translateY(-8px); }
+.docs.hint-fan .docs__sheet--3 { transform: rotate(-17deg) translate(-26px, 4px); }
+.docs.hint-fan .docs__sheet--2 { transform: rotate(-8deg) translate(-12px, 0); }
+.docs.hint-fan .docs__sheet--1 { transform: rotate(5deg) translate(8px, -4px); }
+
+/* ==========================================================================
+   04 · CHALLENGES — the tangle resolves into the brand's arch
+   ========================================================================== */
+.knot { position: relative; max-width: 38rem; margin-inline: auto; }
+.knot__window {
+  --r: var(--radius-l);
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--aw, 50%) var(--aw, 50%) var(--r) var(--r) / var(--aw, 40%) var(--aw, 40%) var(--r) var(--r);
+  background-color: var(--cream);
+  background-image: radial-gradient(80% 55% at 50% 100%, rgb(var(--sage-rgb) / .2), transparent 70%), var(--grain-light);
+  box-shadow: var(--shadow-dark-2);
+  overflow: hidden;
+}
+.knot__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; --fig-head: var(--terracotta-shape); --fig-body: var(--sage-brand); }
+.knot__floor { stroke: rgb(var(--navy-rgb) / .16); stroke-width: 1.5; stroke-linecap: round; }
+/* once the tangle has resolved, the space between the two people becomes an opening (the logo's doorway) */
+.knot__opening { fill-opacity: .85; opacity: var(--door, 1); transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(calc(.86 + var(--door, 1) * .14)); }
+.knot__shade { fill: rgb(var(--navy-rgb) / .1); }
+.knot__line { fill: none; stroke: var(--clay); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.knot__dot { fill: var(--terracotta); transform-box: fill-box; transform-origin: 50% 50%; transform: scale(var(--dot, 1)); }
+.knot__f { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .8s var(--ease-out); }
+.knot__f--a { transform: translateX(var(--fx, 0px)); }
+.knot__f--b { transform: translateX(calc(var(--fx, 0px) * -1)); }
+.knot.hint .knot__dot { animation: team-pulse 1.2s var(--ease-in-out) infinite; }
+.knot.hint { --fx: 6px; }
+.knot__opening { transition: fill-opacity .5s var(--ease-out); }
+.knot__g0 { stop-color: var(--sage); stop-opacity: .06; }
+.knot__g1 { stop-color: var(--sage); stop-opacity: .3; }
+.knot__g2 { stop-color: var(--sage-brand); stop-opacity: .5; }
+.knot.hint .knot__opening { fill-opacity: 1; }
+
+/* quote in chapter 4 */
+.who-quote { margin: 0; max-width: 36rem; }
+.who-quote p { font-size: clamp(1.2rem, 1rem + .8vw, 1.6rem); font-weight: 560; line-height: 1.4; letter-spacing: -0.016em; color: var(--heading); text-wrap: pretty; }
+.who-quote footer { display: flex; align-items: center; gap: .85rem; margin-top: var(--space-m); font-size: var(--fs-small); color: var(--muted); }
+.who-quote strong { color: var(--text); font-weight: 650; margin-right: .35rem; }
+.who-quote__mark { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 999px 999px 8px 8px; background: rgb(var(--cream-rgb) / .08); }
+.who-quote__mark svg { width: 1.3rem; height: auto; }
+
+/* ==========================================================================
+   CLOSE — "I'd be happy to help"
+   ========================================================================== */
+.who-close {
+  position: relative;
+  border-radius: 50% 50% 0 0 / var(--dome) var(--dome) 0 0;
+  margin-top: calc(var(--dome) * -1);
+  padding-top: calc(var(--dome) + clamp(2.5rem, 1rem + 5vw, 6rem));
+  padding-bottom: clamp(4.5rem, 3rem + 5vw, 8rem);
+}
+.who-close__inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-l); }
+.who-close__doors { display: flex; align-items: flex-end; gap: clamp(.75rem, 2vw, 1.5rem); }
+.who-close__door { display: block; width: clamp(2rem, 1.5rem + 1.5vw, 2.9rem); --door-frame: var(--navy); --fig-body: var(--sage-brand); --fig-head: var(--terracotta-shape); transition: transform .6s var(--ease-spring); }
+.who-close__door:nth-child(2) { width: clamp(2.3rem, 1.7rem + 1.8vw, 3.4rem); }
+.who-close__door:nth-child(3) { width: clamp(2.6rem, 1.9rem + 2.1vw, 3.9rem); }
+.who-close__door:nth-child(4) { width: clamp(2.9rem, 2.1rem + 2.4vw, 4.4rem); }
+.who-close__door svg { width: 100%; height: auto; overflow: visible; }
+.who-close__door:hover { transform: translateY(-4px); }
+.who-close__statement {
+  max-width: 24ch;
+  font-size: clamp(1.75rem, 1.05rem + 2.9vw, 3.9rem);
+  font-weight: 680;
+  line-height: 1.1;
+  letter-spacing: -0.034em;
+  color: var(--heading);
+  text-wrap: balance;
+}
+.who-close__statement a {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.08em;
+  letter-spacing: -0.012em;
+  color: var(--clay-ink);
+  background: linear-gradient(var(--clay), var(--clay)) 0 90% / 100% 2px no-repeat;
+  transition: background-size .5s var(--ease-out), color var(--dur-2);
+  padding-bottom: .02em;
+}
+.who-close__statement a:hover { background-size: 100% 4px; color: var(--navy); }
+.who-close__statement em { font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 1.08em; letter-spacing: -0.012em; color: var(--clay); }
+.who-close__by { font-size: var(--fs-small); color: var(--muted); }
+.who-close__by strong { color: var(--text); font-weight: 650; margin-right: .35rem; }
+.who-close__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-s); margin-top: var(--space-2xs); }
+.who-close__contact { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.75rem; font-size: var(--fs-small); }
+.who-close__contact a { display: inline-flex; align-items: center; gap: .55rem; padding: .35rem 0; font-weight: 600; color: var(--text); background: linear-gradient(currentColor, currentColor) 0 100% / 0% 1px no-repeat; transition: background-size .5s var(--ease-out); }
+.who-close__contact a:hover, .who-close__contact a:focus-visible { background-size: 100% 1px; }
+.who-close__contact .icon { color: var(--sage-ink); }
+@media (max-width: 29.99em) {
+  .who-close__actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .who-close__actions .btn { width: 100%; }
+}
+
+/* ==========================================================================
+   Pointer depth (who.js sets --mx/--my −1..1 on the illustration, mouse + motion only): the window leans toward
+   the cursor, its layers sit at different depths, and a soft light follows. Untouched, every value rests at 0.
+   ========================================================================== */
+:is(.found__window, .team__window, .docs__window, .knot__window) {
+  transform: perspective(1400px) rotateX(calc(var(--my, 0) * -2.4deg)) rotateY(calc(var(--mx, 0) * 3.2deg));
+}
+:is(.found__window, .team__window, .docs__window, .knot__window)::after {
+  content: "";
+  position: absolute; inset: 0; z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(46% 40% at calc(50% + var(--mx, 0) * 34%) calc(38% + var(--my, 0) * 28%), var(--sheen), transparent 72%);
+  opacity: 0;
+  transition: opacity .7s var(--ease-out);
+}
+.found__window, .docs__window { --sheen: rgb(var(--cream-rgb) / .1); }
+.team__window, .knot__window { --sheen: rgb(var(--terracotta-rgb) / .09); }
+.is-near > :is(.found__window, .team__window, .docs__window, .knot__window)::after { opacity: 1; }
+.found__door { translate: calc(var(--mx, 0) * -9px) calc(var(--my, 0) * -5px); }
+.found__slab { translate: calc(var(--mx, 0) * (3px + var(--i) * 1.2px)) calc(var(--my, 0) * 2px); }
+.team__arches, .team__ring { translate: calc(var(--mx, 0) * -4px) calc(var(--my, 0) * -3px); }
+.team__people { translate: calc(var(--mx, 0) * 7px) calc(var(--my, 0) * 4px); }
+.docs__sheet--3 { translate: calc(var(--mx, 0) * -7px) calc(var(--my, 0) * -5px); }
+.docs__sheet--2 { translate: calc(var(--mx, 0) * -2px) calc(var(--my, 0) * -1px); }
+.docs__sheet--1 { translate: calc(var(--mx, 0) * 7px) calc(var(--my, 0) * 5px); }
+.knot__opening { translate: calc(var(--mx, 0) * -5px) calc(var(--my, 0) * -3px); }
+.knot__line, .knot__dot { translate: calc(var(--mx, 0) * -2px) calc(var(--my, 0) * -2px); }
+.knot__f { translate: calc(var(--mx, 0) * 8px) calc(var(--my, 0) * 3px); }
+
+/* ==========================================================================
+   Settled states: screenshots (?shot=1), reduced motion and failed JS show every illustration complete
+   (who.js drives the scroll-linked states only when motion is allowed)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .team.hint-people .team__p--2, .team.hint-ring .team__dot, .knot.hint .knot__dot, .docs.hint-scan .docs__scan { animation: none; }
+}
+
+/* pinned illustrations (desktop, see CHAPTERS): each one is capped so it always fits under the floating header */
+@media (min-width: 64em) and (min-height: 42em) {
+  .found { max-width: min(38rem, calc((var(--fit) - 24rem) * 1.6)); }
+  .team { max-width: min(38rem, calc(var(--fit) * .95)); }
+  .docs { max-width: min(38rem, calc(var(--fit) * .86)); }
+  .knot { max-width: min(38rem, var(--fit)); }
+}
+
+/* ==========================================================================
+   Review helpers (screenshots only): a very tall ?shot=1 window keeps the hero at a normal height
+   ========================================================================== */
+html.shot-tall .who-hero { min-height: 58rem; }
+@media (max-width: 47.99em) { html.shot-tall .who-hero { min-height: 0; } }
