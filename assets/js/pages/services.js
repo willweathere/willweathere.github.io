@@ -85,17 +85,28 @@ fbNodes.forEach((n, i) => {
 /* ---------------------------------------------------------------- scroll: the row at the reading line */
 const mqDesk = matchMedia('(min-width: 64em)');
 const stageCol = $('.svc-stagecol');
-let rowTops = [], rowBottoms = [], bandH = 0, vh = innerHeight;
+const intro = $('.svc-intro');
+// phones / tablets: the band overlaps the intro's foot until it sticks (see services.css, .is-banded)
+explorer?.classList.add('is-banded');
+let rowTops = [], rowBottoms = [], bandH = 0, vh = innerHeight, bandTop = Infinity, stuck = false;
 const measure = () => {
   vh = innerHeight;
   const y = scrollY;
   rowTops = rows.map((r) => r.getBoundingClientRect().top + y);
   rowBottoms = rows.map((r, i) => rowTops[i] + r.offsetHeight);
   bandH = mqDesk.matches ? 0 : (stageCol?.offsetHeight || 0);
+  // where the band sits in flow (its sticky rect is no use once stuck): just below the intro, minus its overlap
+  bandTop = mqDesk.matches || !stageCol || !intro ? Infinity
+    : intro.getBoundingClientRect().bottom + y + (parseFloat(getComputedStyle(stageCol).marginTop) || 0);
+};
+const readStuck = (y) => {
+  const s = y >= bandTop - 0.5;
+  if (s !== stuck) { stuck = s; stageCol.classList.toggle('is-stuck', s); }
 };
 const readCurrent = () => {
   if (!rows.length) return;
   const y = scrollY;
+  readStuck(y);
   const line = y + (bandH ? bandH + (vh - bandH) * 0.28 : vh * 0.5);
   let c = -1;
   if (line >= rowTops[0] - 4 && line <= rowBottoms[rows.length - 1] + 4) {

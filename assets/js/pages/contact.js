@@ -4,7 +4,8 @@
      The page tells the scene where it may draw (clear of the copy, above Sarah's card) and mirrors the same frame
      onto the static art, so the fallback and the live world line up.
    3 hovering / focusing a channel sends a message along the arc. */
-import { mount, hasWebGL2 } from '/assets/js/3d/engine.js';
+import HC from '/assets/js/site.js';
+import { mount, hasWebGL2, lowPower } from '/assets/js/3d/engine.js';
 
 const d = document;
 const $ = (s, r = d) => r.querySelector(s);
@@ -157,7 +158,9 @@ if (stage) {
   // backstop: once the card has finished rising in, frame against where it actually stands
   person?.addEventListener('transitionend', (e) => { if (e.target === person && e.propertyName === 'transform') reframe(); });
 
-  if (hasWebGL2() && webgl2Works()) {
+  // SPEC: reduced motion, low-power devices and no WebGL keep the static art and never download three.js
+  const can3d = hasWebGL2() && (HC.shot || (!HC.reduced() && !lowPower())) && webgl2Works();
+  if (can3d) {
     // The static art is held back while the world loads (the type leads the first beat and the world stages its own
     // entrance). If the world is late or unavailable the art comes in instead, and a late world then skips its
     // entrance, so the cross-fade is between two matching, settled compositions. Screenshots / reduced motion: the

@@ -163,20 +163,23 @@ html.shot .cons-hero::before { animation: none; }
   content: "";
   position: absolute; inset: 0; z-index: 2;
   pointer-events: none;
-  background: linear-gradient(180deg, rgb(var(--navy-rgb) / 0) calc(100% - var(--dome) * .7), var(--background));
+  /* the hero's real ground (navy + the print grain), faded in through a mask on this static layer: a flat navy fade
+     would sit a shade darker than the grained ground and draw a visible seam where it ends */
+  background: var(--navy) var(--grain-dark);
+  -webkit-mask: linear-gradient(180deg, transparent calc(100% - var(--dome) * .7), #000);
+  mask: linear-gradient(180deg, transparent calc(100% - var(--dome) * .7), #000);
 }
 @media (min-width: 64em) and (min-aspect-ratio: 5/6) {
   /* side by side: the line arrives out of the copy side, so the left edge dissolves too */
   .cons-hero__stage::after {
-    background:
-      linear-gradient(90deg, var(--background), rgb(var(--navy-rgb) / 0) 16%),
-      linear-gradient(180deg, rgb(var(--navy-rgb) / 0) calc(100% - var(--dome) * .7), var(--background));
+    -webkit-mask: linear-gradient(90deg, #000, transparent 16%), linear-gradient(180deg, transparent calc(100% - var(--dome) * .7), #000);
+    mask: linear-gradient(90deg, #000, transparent 16%), linear-gradient(180deg, transparent calc(100% - var(--dome) * .7), #000);
   }
 }
 @media (max-width: 63.99em), (max-aspect-ratio: 5/6) {
   .cons-hero__stage::after {
-    background:
-      linear-gradient(180deg, var(--background), rgb(var(--navy-rgb) / 0) 8%, rgb(var(--navy-rgb) / 0) calc(100% - var(--dome) * .6), var(--background));
+    -webkit-mask: linear-gradient(180deg, #000, transparent 8%, transparent calc(100% - var(--dome) * .6), #000);
+    mask: linear-gradient(180deg, #000, transparent 8%, transparent calc(100% - var(--dome) * .6), #000);
   }
 }
 /* the doorway in the canvas is a way in: hovering it opens the doors wider, a click goes to the form (page JS) */

@@ -18,7 +18,7 @@
  * Budget: ~26 draw calls (4 arches, 4 shadows, 3 × people (2 each), 3 cards (2 each), arc + dot, 1–2 lines,
  * disc + shadow, particles). No per-frame allocation.
  */
-import { createKit, ease, clamp01, damp, archRingShape, extrude } from '../kit.js';
+import { createKit, ease, clamp01, damp, archRingShape, extrude, HEX } from '../kit.js';
 
 const outBack = (t) => { const c1 = 1.55, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
 
@@ -70,15 +70,39 @@ export default async function create(ctx) {
   const m1 = kit.people({ items: TEAM });
   doors[1].motif.add(m1.group);
 
-  /* 2 · documents */
-  const cardOpts = { width: 18 / 56, height: 25 / 56, depth: 0.012, radius: 0.028, textureSize: 512 };
+  /* 2 · documents — the static art's three sheets (sand, paper, cream). Their faces are drawn here rather than with
+     the kit's skeleton faces: at this size those read as blank cards, so the front sheet carries the static art's
+     exact marks (a clay rule and four navy lines, in sheet units) drawn bold enough to read at ~60 px wide. */
+  const SHEET = { w: 18, h: 25 };
+  const cardOpts = { width: SHEET.w / 56, height: SHEET.h / 56, depth: 0.012, radius: 0.028 };
+  const faceInset = Math.min(cardOpts.depth * 0.45, 0.018);
+  const faceW = cardOpts.width - faceInset * 2, faceH = cardOpts.height - faceInset * 2;
+  const faceGeo = ctx.track(new THREE.PlaneGeometry(faceW, faceH));
+  const faceSize = ctx.quality.textureSize >= 1024 ? 512 : 256;
+  const drawSheet = (bg, rows, ruleW) => (g, W, H) => {
+    const u = W / SHEET.w, r = ((cardOpts.radius - faceInset) / faceW) * W;
+    g.clearRect(0, 0, W, H);
+    g.fillStyle = bg;
+    g.beginPath(); g.moveTo(r, 0); g.arcTo(W, 0, W, H, r); g.arcTo(W, H, 0, H, r); g.arcTo(0, H, 0, 0, r); g.arcTo(0, 0, W, 0, r); g.closePath(); g.fill();
+    g.lineCap = 'round';
+    g.strokeStyle = HEX.clay; g.lineWidth = 1.25 * u;
+    g.beginPath(); g.moveTo(3 * u, 4 * u); g.lineTo((3 + ruleW) * u, 4 * u); g.stroke();
+    g.strokeStyle = 'rgba(26, 40, 66, .3)'; g.lineWidth = 1.05 * u;
+    for (const [y, x1] of rows) { g.beginPath(); g.moveTo(3 * u, y * u); g.lineTo(x1 * u, y * u); g.stroke(); }
+  };
   const DOCS = [
-    { face: { variant: 'text', seed: 4, lines: 7 }, style: 'cream', rz: -0.175, rzOn: -0.33, x: -0.02, xOn: -0.075, z: -0.075 },
-    { face: { variant: 'text', seed: 9, lines: 7 }, style: 'paper', rz: -0.07, rzOn: -0.155, x: -0.008, xOn: -0.035, z: -0.045 },
-    { face: { variant: 'checklist', seed: 2, lines: 4, checked: 4 }, style: 'cream', rz: 0.07, rzOn: 0.14, x: 0, xOn: 0.035, z: -0.015 },
+    { bg: HEX.sand, rows: [[8.5, 14], [11.5, 12]], rule: 4.5, rz: -0.175, rzOn: -0.36, x: -0.02, xOn: -0.09, z: -0.075 },
+    { bg: HEX.paper, rows: [[8.5, 15], [11.5, 13], [14.5, 14.5]], rule: 5, rz: -0.07, rzOn: -0.17, x: -0.008, xOn: -0.042, z: -0.045 },
+    { bg: HEX.cream, rows: [[8.5, 15], [11.5, 13.5], [14.5, 15], [17.5, 10]], rule: 5.5, rz: 0.07, rzOn: 0.15, x: 0, xOn: 0.042, z: -0.015 },
   ];
   const cards = DOCS.map((dcfg) => {
-    const c = kit.card({ ...cardOpts, style: dcfg.style, face: { ...dcfg.face, mark: true } });
+    const c = kit.card({ ...cardOpts, style: dcfg.bg === HEX.cream ? 'cream' : 'paper', face: null });
+    const map = kit.canvasTexture(360, 500, drawSheet(dcfg.bg, dcfg.rows, dcfg.rule), { maxSize: faceSize });
+    const faceMat = ctx.track(new THREE.MeshStandardMaterial({ map, roughness: 0.84, metalness: 0, alphaTest: 0.5, premultipliedAlpha: true }));
+    faceMat.color.setScalar(0.93);                  // the key light otherwise washes the cream face out
+    const face = new THREE.Mesh(faceGeo, faceMat);
+    face.position.z = cardOpts.depth / 2 + 0.0015;
+    c.group.add(face);
     const pivot = new THREE.Group();        // rotate about the card's bottom centre
     c.group.position.y = 25 / 56 / 2;
     pivot.add(c.group);

@@ -116,6 +116,25 @@ html.shot .svc-orbitword__ring path, html.no-js .svc-orbitword__ring path, html.
   background-color: var(--navy);
   background-image: var(--grain-dark);
 }
+/* Phones / tablets with services.js running (.is-banded): the band's header clearance overlaps the intro's foot while
+   the band is still in flow, so the world starts in the first screen instead of below the fold. The band stays see-through
+   until it sticks; then an opaque cover fades in so the index can slide beneath it. Only opacity changes on scroll. */
+.svc-stagewrap__cover { display: none; }
+@media (max-width: 63.99em) {
+  .svc-explorer.is-banded .svc-stagecol { margin-top: calc((var(--header-h) + env(safe-area-inset-top, 0px) - .5rem) * -1); }
+  .svc-explorer.is-banded .svc-stagewrap { background: none; }
+  .svc-explorer.is-banded .svc-stagewrap__cover {
+    display: block;
+    position: absolute; inset: 0; z-index: -1;   /* under the light and the world (the band is its own stacking context) */
+    background-color: var(--navy);
+    background-image: var(--grain-dark);
+    opacity: 0;
+    transition: opacity .3s var(--ease-out);
+  }
+  .svc-explorer.is-banded .svc-stagecol.is-stuck .svc-stagewrap__cover { opacity: 1; }
+  .svc-explorer.is-banded .svc-stagewrap::after { opacity: 0; transition: opacity .3s var(--ease-out); }
+  .svc-explorer.is-banded .svc-stagecol.is-stuck .svc-stagewrap::after { opacity: 1; }
+}
 .svc-stagewrap::after { /* the index fades as it slides beneath the band */
   content: "";
   position: absolute; left: 0; right: 0; top: 100%;

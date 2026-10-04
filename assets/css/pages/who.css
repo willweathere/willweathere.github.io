@@ -50,11 +50,9 @@ html.js .page-who [data-reveal].is-in { clip-path: none; }
     radial-gradient(26% 34% at 82% 22%, rgb(var(--terracotta-rgb) / .06), transparent 70%);
   pointer-events: none;
 }
+/* no mask/filter on the canvas (the compositor would re-process it every frame): its bottom edge sits exactly where
+   the first chapter's dome reaches full width, so the dome itself hides it */
 .who-hero__stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-.who-hero__stage .hc3d-canvas {
-  -webkit-mask-image: linear-gradient(#000 calc(100% - var(--dome) * 1.05), transparent calc(100% - var(--dome) * .35));
-  mask-image: linear-gradient(#000 calc(100% - var(--dome) * 1.05), transparent calc(100% - var(--dome) * .35));
-}
 .who-hero__inner { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; gap: clamp(2.5rem, 1rem + 4vw, 4.25rem); width: 100%; }
 .who-hero__copy { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(1rem, .7rem + 1vw, 1.6rem); }
 .who-hero__copy .breadcrumbs { margin-bottom: clamp(.5rem, 2vw, 1.75rem); }
@@ -501,8 +499,7 @@ html.js-failed .who-hero :is(.wd-art, .who-door__line, .who-hero__disc) { opacit
   transform: translateX(-50%);
   padding: .5rem 1rem .5rem .9rem;
   border-radius: var(--radius-pill);
-  background: rgb(var(--navy-rgb) / .78);
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  background: rgb(var(--navy-deep-rgb) / .92);
   border: 1px solid rgb(var(--cream-rgb) / .12);
   font-size: var(--fs-xs); font-weight: 650; letter-spacing: .02em; color: var(--cream);
   white-space: nowrap;
