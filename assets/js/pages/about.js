@@ -6,7 +6,7 @@
    ?shot=1 / reduced motion: settled states (chapters fully visible, line drawn, 3D at the exact chapter pose).
    Review helper (screenshots only): ?shot=1&ab-p=<0..5> shows the window at that story state. */
 import HC from '/assets/js/site.js';
-import { mount, hasWebGL2 } from '/assets/js/3d/engine.js';
+import { mount, hasWebGL2, lowPower } from '/assets/js/3d/engine.js';
 
 const d = document;
 const SHOT = HC.shot;
@@ -15,6 +15,15 @@ const $ = (s, r = d) => r.querySelector(s);
 const $$ = (s, r = d) => Array.from(r.querySelectorAll(s));
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const debounce = (fn, t = 140) => { let id; return () => { clearTimeout(id); id = setTimeout(fn, t); }; };
+// ask for a real WebGL2 context once and hand it straight back
+const webgl2Works = () => {
+  try {
+    const gl = d.createElement('canvas').getContext('webgl2');
+    if (!gl) return false;
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return true;
+  } catch { return false; }
+};
 const passive = { passive: true };
 const PARAMS = new URLSearchParams(location.search);
 const FORCE_P = SHOT && PARAMS.has('ab-p') ? clamp(+PARAMS.get('ab-p') || 0, 0, 5) : null;
@@ -113,11 +122,14 @@ if (win && stage && story) {
   // 3D: the world inside the doorway (fallback art managed here so it never double-exposes with the live world)
   let fbShown = false;
   const showFallback = () => { if (!fbShown) { fbShown = true; stage.classList.add('fb-on'); } };
-  // real capability probe (a class check alone lets three.js log a context error on blocklisted GPUs)
-  const webgl = hasWebGL2();
+  // 3D only where it works and can be smooth: a real WebGL2 context (hasWebGL2() only checks that the API exists, so
+  // on blocked / blocklisted GPUs three.js would fail inside the engine with a console error), and not a save-data /
+  // ≤2 GB / ≤2-core device (SPEC §1: those keep the static art and never download three.js)
+  const webgl = hasWebGL2() && (SHOT || !lowPower()) && webgl2Works();
   // the static art mirrors the opening pose, so at the top of the page it stands in from the first paint and the
   // 3D world cross-fades over it; deeper in the story it only appears if the world is late (no double exposure)
-  if (!webgl || (!SHOT && scrollY < innerHeight * 0.3)) showFallback();
+  // (screenshots too, unless a later story state is forced: the art only mirrors the opening pose)
+  if (!webgl || (scrollY < innerHeight * 0.3 && !FORCE_P)) showFallback();
   else if (!SHOT) setTimeout(() => { if (stage.getAttribute('data-3d') !== 'live') showFallback(); }, 2400);
   let wasLive = false;
   new MutationObserver(() => {

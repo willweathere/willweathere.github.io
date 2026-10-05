@@ -97,10 +97,17 @@ if (hero && stage) {
   if (still()) showFallback(false);
   else if (!webgl) showFallback(true);
   else setTimeout(() => { if (stage.getAttribute('data-3d') !== 'live') showFallback(true); }, 2200);
+  // the engine marks the stage live as its canvas STARTS fading in; the static art sits above the canvas, so it only
+  // begins its own fade once the canvas is fully in (a cross-dissolve between the two, never a dip to bare navy)
+  const FADE = 650;
+  let liveTimer = 0;
   new MutationObserver(() => {
     const st = stage.getAttribute('data-3d');
-    if (st === 'live') { wasLive = true; hero.classList.add('is-live'); }
-    else {
+    clearTimeout(liveTimer);
+    if (st === 'live') {
+      wasLive = true;
+      liveTimer = setTimeout(() => { if (stage.getAttribute('data-3d') === 'live') hero.classList.add('is-live'); }, still() ? 0 : FADE + 120);
+    } else {
       hero.classList.remove('is-live');
       if (st === 'fallback' || wasLive) showFallback(!still() && !wasLive);
     }
@@ -140,7 +147,7 @@ if (hero && stage) {
     const world = mount(stage, () => import('/assets/js/3d/scenes/who.js'), {
       eager: true,
       fallback: null,
-      fadeMs: 650,
+      fadeMs: FADE,
       scrollTarget: hero,
       sceneOptions: { anchors, disc, get intro() { return !fbShown; } },
     });

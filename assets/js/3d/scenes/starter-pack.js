@@ -21,7 +21,7 @@
  *   heroFloor: 0..1 — (story-stacked) viewport fraction where the hero copy ends; the doorway waits below it
  *   t: initial progress (0 = the pack, 1..7 = item presented, 8 = the doorway complete)
  * api: setProgress(t), setHover(source, index), select(index), pick(clientX, clientY) → index, count
- * Budget (high tier): ≈ 40 draw calls, ≈ 30k triangles, 8 face textures (1024², 512² on low).
+ * Budget (high tier): ≈ 41 draw calls, ≈ 30k triangles, 9 face textures (1024², 512² on low).
  */
 import { createKit, COLORS, HEX, ease, clamp01, lerp, damp, segment, shiftView, FONT_SANS, FONT_SERIF, roundRectShape, archShape, extrude } from '../kit.js';
 
@@ -123,6 +123,26 @@ const ILLUSTRATE = {
     g.fillStyle = HEX.terracotta; g.beginPath(); g.arc(330, 570, 35, 0, Math.PI * 2); g.fill();
     g.strokeStyle = HEX.terracotta; g.lineWidth = 8; g.lineCap = 'round';
     g.beginPath(); g.moveTo(110, 790); g.bezierCurveTo(230, 810, 400, 800, 540, 750); g.stroke();
+  },
+  endpaper(g, radius) { /* the inside of the cover (seen as it opens): sage endpaper, a quiet field of doorways, a bookplate */
+    g.clearRect(0, 0, DW, DH);
+    g.fillStyle = HEX.sage; rr(g, 0, 0, DW, DH, radius); g.fill();
+    g.save(); rr(g, 0, 0, DW, DH, radius); g.clip();
+    const sh = g.createLinearGradient(DW, 0, DW * 0.35, DH);
+    sh.addColorStop(0, 'rgba(255,255,255,0.16)'); sh.addColorStop(1, rgba(NAVY, 0.06));
+    g.fillStyle = sh; g.fillRect(0, 0, DW, DH);
+    g.strokeStyle = rgba(HEX.cream, 0.34); g.lineWidth = 4;
+    for (let r = 0, y = 26; y < DH; r++, y += 92) {
+      for (let x = (r % 2 ? 72 : 30); x < DW; x += 84) { archPath(g, x - 17, x + 17, y + 17, y + 54); g.stroke(); }
+    }
+    g.restore();
+    g.fillStyle = '#FCF8F2'; rr(g, 140, 292, 320, 264, 20); g.fill();
+    g.strokeStyle = rgba(NAVY, 0.1); g.lineWidth = 2; rr(g, 154, 306, 292, 236, 13); g.stroke();
+    drawMark(g, 274, 332, 56);
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    g.fillStyle = HEX.clay; g.font = `italic 400 92px ${FONT_SERIF}`; g.fillText('01', 300, 478);
+    g.font = `650 16px ${FONT_SANS}`; track(g, 3.4); g.fillStyle = HEX.sageDeep; g.fillText('HR STARTER PACK', 300, 518);
+    track(g, 0); g.textAlign = 'left';
   },
   policies(g) {
     g.fillStyle = HEX.sage;
@@ -266,7 +286,12 @@ export default async function create(ctx) {
       const coverR = ((0.06 - 0.0088) / (cw - 0.0176)) * DW;
       const coverFace = face(faceMat((g) => { faceBase(g, d, coverR, M + 50); ILLUSTRATE.cover(g, coverR); }), cd, cw, ch);
       coverFace.position.x = cw / 2;
-      const back = new THREE.Mesh(cardGeo(cd, cw, ch, 0.06), kit.paper(HEX.sageShape, { roughness: 0.8 }));
+      // the endpaper on the inside of the cover, facing the first page (only seen as the cover opens)
+      const endpaper = face(faceMat((g) => ILLUSTRATE.endpaper(g, coverR)), cd, cw, ch);
+      endpaper.rotation.y = Math.PI;
+      endpaper.position.set(cw / 2, 0, -cd / 2 - 0.0004);
+      pivot.add(endpaper);
+      const back =new THREE.Mesh(cardGeo(cd, cw, ch, 0.06), kit.paper(HEX.sageShape, { roughness: 0.8 }));
       back.position.set(0, 0, -d.depth / 2 - cd / 2 - 0.002);
       pivot.add(cover, coverFace);
       main.add(pivot, back);

@@ -177,9 +177,11 @@ html.shot .cons-hero::before { animation: none; }
   }
 }
 @media (max-width: 63.99em), (max-aspect-ratio: 5/6) {
+  /* stacked: only the chapter edge dissolves. (A top band here painted flat navy over the hero's light and drew a hard
+     seam across the page; nothing in the stacked composition reaches the stage's top edge, so it needs no fade.) */
   .cons-hero__stage::after {
-    -webkit-mask: linear-gradient(180deg, #000, transparent 8%, transparent calc(100% - var(--dome) * .6), #000);
-    mask: linear-gradient(180deg, #000, transparent 8%, transparent calc(100% - var(--dome) * .6), #000);
+    -webkit-mask: linear-gradient(180deg, transparent calc(100% - var(--dome) * .6), #000);
+    mask: linear-gradient(180deg, transparent calc(100% - var(--dome) * .6), #000);
   }
 }
 /* the doorway in the canvas is a way in: hovering it opens the doors wider, a click goes to the form (page JS) */

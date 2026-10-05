@@ -44,7 +44,9 @@ if (stage) {
   // SPEC §1: reduced motion, no WebGL2 and low-power devices keep the static art and never download three.js
   const webgl = hasWebGL2();
   const can3d = webgl && (SHOT || (!HC.reduced() && !lowPower()));
-  if (SHOT && can3d) { /* screenshots: the settled world only (the observer below covers a fallback) */ }
+  // screenshots: the settled world; if a slow software renderer hasn't produced it yet, the settled art stands in
+  // (and is cut as soon as the world goes live) so a capture never shows an empty stage
+  if (SHOT && can3d) setTimeout(() => { if (stage.getAttribute('data-3d') !== 'live') showFallback(false); }, 6000);
   else if (!can3d) showFallback(!still());
   else setTimeout(() => { if (stage.getAttribute('data-3d') !== 'live') showFallback(true); }, 2400);
   new MutationObserver(() => {

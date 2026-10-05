@@ -65,7 +65,7 @@ export default async function create(ctx) {
   /* 1 · the team: three people small → large, two more join on focus */
   const TEAM = [
     { p: [-0.202, 0, -0.06], height: 0.179 }, { p: [-0.043, 0, -0.06], height: 0.241 }, { p: [0.159, 0, -0.06], height: 0.304 },
-    { p: [-0.6, 0, 0.26], height: 0.2, ry: 0.3 }, { p: [0.6, 0, 0.26], height: 0.2, ry: -0.3 },
+    { p: [-0.555, 0, 0.26], height: 0.2, ry: 0.3 }, { p: [0.555, 0, 0.26], height: 0.2, ry: -0.3 },
   ];
   const m1 = kit.people({ items: TEAM });
   doors[1].motif.add(m1.group);

@@ -83,12 +83,7 @@
 .ab-hero__cue .arrow { color: var(--clay); rotate: 90deg; }
 .ab-hero__cue:hover, .ab-hero__cue:focus-visible { color: var(--text); }
 .ab-hero__cue:hover .ab-hero__cue-line, .ab-hero__cue:focus-visible .ab-hero__cue-line { transform: scaleX(1.5); }
-/* the eyebrow's two halves break cleanly on phones */
 @media (max-width: 29.99em) {
-  .ab-hero__sep { display: none; }
-  .ab-hero__eyebrow { align-items: flex-start; }
-  .ab-hero__eyebrow::before { margin-top: .32em; }
-  .ab-hero__eyebrow-2 { display: block; margin-top: .35em; }
   .ab-hero__actions { flex-direction: column; align-items: stretch; width: 100%; gap: .6rem; }
   .ab-hero__actions .btn { width: 100%; }
   .ab-hero__actions .btn--lg { --btn-h: 3.35rem; }
